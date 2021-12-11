@@ -83,7 +83,11 @@ EOF
 
     LOG "Compiling WiringPi"
     cd vendor/WiringPi/wiringPi
-    cmake . -DCMAKE_TOOLCHAIN_FILE=toolchain-rpi.cmake -GNinja
+    if [ $TOOLCHAIN_ENABLED -ne 0 ] ; then
+        cmake . -DCMAKE_TOOLCHAIN_FILE=toolchain-rpi.cmake -GNinja
+    else
+        cmake . -GNinja
+    fi
     ninja
     cd ../../..
 
@@ -186,7 +190,11 @@ build() {
 
     if [ ! -f CMakeCache.txt ] ; then
         LOG "Generating build files"
-        cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain-rpi.cmake -GNinja
+        if [ $TOOLCHAIN_ENABLED -ne 0 ] ; then
+            cmake .. -DCMAKE_TOOLCHAIN_FILE=../toolchain-rpi.cmake -GNinja
+        else
+            cmake .. -GNinja
+        fi
     fi
 
     LOG "Starting build"
