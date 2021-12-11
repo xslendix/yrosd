@@ -1,0 +1,14 @@
+[Unit]
+Description=Drip system service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/dripd
+ExecReload=/usr/bin/dripd -r
+ExecStop=/usr/bin/dripd -s
+TimeoutStopSec=5
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

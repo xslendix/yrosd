@@ -1,0 +1,6 @@
+build
+tools
+vendor/WiringPi
+vendor/opencv*
+.vscode
+toolchain-rpi.cmake
