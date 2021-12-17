@@ -37,7 +37,7 @@ target_link_libraries(dripd PRIVATE Threads::Threads)
 find_package(OpenCV)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-set(WPI_PATH ${MAKE_CURRENT_LIST_DIR}/vendor/WiringPi/wiringPi)
+set(WPI_PATH ${CMAKE_CURRENT_LIST_DIR}/vendor/WiringPi/wiringPi)
 
 include_directories(include ${WPI_PATH})
 find_library(WPI_LIB wiringPi HINTS ${WPI_PATH} NO_CMAKE_FIND_ROOT_PATH)
