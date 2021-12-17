@@ -9,6 +9,17 @@ if ! command -v cmake &> /dev/null; then
     exit
 fi
 
+if ! command -v docker &> /dev/null; then
+    LOG "Docker could not be found. Please install it."
+    exit
+fi
+
+if id -nG "$(whoami)" | grep -qw "docker"; then
+    LOG "Docker properly installed!"
+else
+    LOG "Please add your user to the docker group."
+fi
+
 if ! command -v ninja &> /dev/null; then
     LOG "Ninja could not be found. Please install it."
     exit
@@ -36,10 +47,15 @@ toolchain() {
             sed "s|__TOOLPATH__|$PWD/tools|g" toolchain-rpi.template.cmake > toolchain-rpi.cmake
         fi
 
-        if [ ! -d "$PWD/tools" ] ; then
+        if [ ! -d "$PWD/cross/toolchain/x-tools" ] ; then
             LOG "Getting toolchain"
-            git clone --depth 1 https://github.com/rvagg/rpi-newer-crosstools tools
+            git clone --depth 1 https://github.com/xslendix/RPi-Cpp-Toolchain cross
+            cd cross/toolchain
+            ./toolchain.sh rpi3-aarch64 --export
+            cd ../..
         fi
+    else
+        LOG "WARNING! BUILDING ON THE RASPBERRY PI IS NOT YET SUPPORTED!"
     fi
 }
 
@@ -96,69 +112,9 @@ EOF
     fi
 }
 
-opencv() {
-    toolchain
-
-    OPENCV_VERSION=4.5.4-2
-    if [ $TOOLCHAIN_ENABLED -ne 0 ] ; then
-        if [ ! -f "tools/x64-gcc-8.3.0/arm-rpi-linux-gnueabihf/arm-rpi-linux-gnueabihf/sysroot/usr/local/share/opencv4/haarcascades/haarcascade_eye.xml" ] ; then
-            LOG "Getting OpenCV"
-            cd tools/x64-gcc-8.3.0/arm-rpi-linux-gnueabihf/arm-rpi-linux-gnueabihf/sysroot
-            wget https://github.com/prepkg/opencv-raspberrypi/releases/download/$OPENCV_VERSION/opencv.deb
-            ar x opencv.deb
-            tar xvf data.tar.xz
-            rm -f control.tar.xz data.tar.xz dedian-binary opencv.*
-        fi
-    fi
-
-    # OPENCV_VERSION=3.4.0
-    # if [ ! -f "vendor/opencv-$OPENCV_VERSION/.patched" ] ; then
-    #     LOG "Getting OpenCV"
-    #     [ ! -f "/tmp/opencv.zip" ] && wget -O /tmp/opencv.zip https://github.com/opencv/opencv/archive/$OPENCV_VERSION.zip
-    #     [ ! -f "/tmp/opencv-contrib.zip" ] && wget -O /tmp/opencv-contrib.zip https://github.com/opencv/opencv_contrib/archive/$OPENCV_VERSION.zip
-    #     cd vendor
-    #     rm -rf opencv*
-    #     unzip /tmp/opencv.zip
-    #     # unzip /tmp/opencv-contrib.zip
-
-    #     LOG "Patching OpenCV"
-    #     # sed -i '259d' $PWD/opencv-$OPENCV_VERSION/cmake/OpenCVCompilerOptions.cmake
-
-    #     LOG "Building OpenCV"
-
-    #     cd opencv-$OPENCV_VERSION
-    #     mkdir -p build
-    #     cd build
-
-    #     cmake \
-    #         -D CV_DISABLE_OPTIMIZATION=ON -D CPU_BASELINE="" -D CPU_DISPATCH="" \
-    #         -D CMAKE_BUILD_TYPE=RELEASE \
-    #         -D CMAKE_INSTALL_PREFIX=$PWD/../../opencv \
-    #         -D INSTALL_PYTHON_EXAMPLES=OFF \
-    #         -D BUILD_EXAMPLES=OFF .. \
-    #         -D WITH_GTK=OFF \
-    #         -D WITH_GTK_2_X=OFF \
-    #         -DCMAKE_TOOLCHAIN_FILE=../../../toolchain-rpi.cmake \
-    #         -G Ninja
-
-    #         # -D OPENCV_EXTRA_MODULES_PATH=../../opencv_contrib-$OPENCV_VERSION/modules \
-    #         # -D WITH_CUDA=OFF \
-    #     
-    #     ninja
-    #     ninja install
-
-    #     LOG "Compressing OpenCV"
-    #     tar -zcvf ../../opencv_build.tar.gz install
-
-    #     cd ../..
-
-    #     touch vendor/opencv-$OPENCV_VERSION/.patched
-    #fi
-}
-
 cleantoolchain() {
     LOG "Deleting toolchain"
-    rm -rf tools toolchain-rpi.cmake
+    rm -rf cross toolchain-rpi.cmake
 }
 
 cleanwiringpi() {

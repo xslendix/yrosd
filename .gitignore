@@ -1,5 +1,5 @@
 build
-tools
+cross
 vendor/WiringPi
 vendor/opencv*
 .vscode
