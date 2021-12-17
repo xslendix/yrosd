@@ -65,16 +65,6 @@ wiringpi () {
         git clone --depth 1 https://github.com/WiringPi/WiringPi vendor/WiringPi
 
         LOG "Patching WiringPi"
-        # sed -i '782,822d' $PWD/vendor/WiringPi/wiringPi/wpiExtensions.c
-        # sed -i '531,536d' $PWD/vendor/WiringPi/wiringPi/wpiExtensions.c
-        # sed -i '64d' $PWD/vendor/WiringPi/wiringPi/wpiExtensions.c
-        # sed -i '58d' $PWD/vendor/WiringPi/wiringPi/wpiExtensions.c
-        # rm -f $PWD/vendor/WiringPi/wiringPi/drcNet.{h,c}
-        # rm -f $PWD/vendor/WiringPi/wiringPi/rht03.{h,c}
-
-        # for file in $PWD/vendor/WiringPi/wiringPi/*c; do
-        #     sed -i '1s/^/#include <time.h>\n/' $file
-        # done
 
         LOG "Creating CMakeLists for WiringPi"
         cat<< EOF > vendor/WiringPi/wiringPi/CMakeLists.txt
@@ -195,11 +185,10 @@ Tasks:
   - Purge -> Deletes everything, the toolchain, WiringPi and build files.
 EOF
     fi
-    
+
     [ "$(echo $1 | tr '[:upper:]' '[:lower:]')" == "all" ] && all
     [ "$(echo $1 | tr '[:upper:]' '[:lower:]')" == "toolchain" ] && toolchain
     [ "$(echo $1 | tr '[:upper:]' '[:lower:]')" == "wiringpi" ] && wiringpi
-    [ "$(echo $1 | tr '[:upper:]' '[:lower:]')" == "opencv" ] && opencv
     [ "$(echo $1 | tr '[:upper:]' '[:lower:]')" == "cleantoolchain" ] && cleantoolchain
     [ "$(echo $1 | tr '[:upper:]' '[:lower:]')" == "cleanwiringpi" ] && cleanwiringpi
     [ "$(echo $1 | tr '[:upper:]' '[:lower:]')" == "clean" ] && clean
