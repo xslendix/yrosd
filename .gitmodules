@@ -1,0 +1,12 @@
+[submodule "vendor/spdlog"]
+	path = vendor/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "vendor/cpp-mjpeg-streamer"]
+	path = vendor/cpp-mjpeg-streamer
+	url = https://github.com/nadjieb/cpp-mjpeg-streamer
+[submodule "vendor/argparse"]
+	path = vendor/argparse
+	url = https://github.com/jamolnng/argparse.git
+[submodule "vendor/tomlplusplus"]
+	path = vendor/tomlplusplus
+	url = https://github.com/marzer/tomlplusplus.git
