@@ -44,7 +44,7 @@ toolchain() {
     if [ $TOOLCHAIN_ENABLED -ne 0 ] ; then
         if [ ! -f "toolchain-rpi.cmake" ] ; then
             LOG "Creating toolchain file"
-            sed "s|__TOOLPATH__|$PWD/tools|g" toolchain-rpi.template.cmake > toolchain-rpi.cmake
+            sed "s|__TOOLPATH__|$PWD/|g" toolchain-rpi.template.cmake > toolchain-rpi.cmake
         fi
 
         if [ ! -d "$PWD/cross/toolchain/x-tools" ] ; then
