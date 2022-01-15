@@ -4,3 +4,4 @@ vendor/WiringPi
 vendor/opencv*
 .vscode
 toolchain-rpi.cmake
+settings.sh

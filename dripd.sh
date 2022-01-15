@@ -37,6 +37,7 @@ fi
 
 grep -q BCM2708 /proc/cpuinfo
 TOOLCHAIN_ENABLED=$?
+LOG "Toolchain enabled: $TOOLCHAIN_ENABLED"
 
 set -e
 
@@ -51,7 +52,7 @@ toolchain() {
             LOG "Getting toolchain"
             git clone --depth 1 https://github.com/xslendix/RPi-Cpp-Toolchain cross
             cd cross/toolchain
-            ./toolchain.sh rpi3-aarch64 --export
+            ./toolchain.sh rpi3-armv8 --export
             cd ../..
         fi
     else
@@ -104,7 +105,7 @@ EOF
 
 cleantoolchain() {
     LOG "Deleting toolchain"
-    rm -rf cross toolchain-rpi.cmake
+    sudo rm -rf cross toolchain-rpi.cmake
 }
 
 cleanwiringpi() {
@@ -157,12 +158,15 @@ deploy() {
     source settings.sh
 
     LOG "Deploying executable"
-    scp -P$RPI_PORT build/dripd $RPI_USER@$RPI_HOST:/usr/local/bin
-    ssh -p$RPI_PORT $SPI_USER@$RPI_HOST "chmod +x /usr/local/bin/dripd"
+    scp -P$RPI_PORT build/dripd dripd.conf dripd.service $RPI_USER@$RPI_HOST:~
+    # scp -P$RPI_PORT dripd.conf $RPI_USER@$RPI_HOST:~/dripd.conf
+    # scp -P$RPI_PORT dripd.service $RPI_USER@$RPI_HOST:~/dripd.service
+    ssh -p$RPI_PORT $RPI_USER@$RPI_HOST 'chmod +x ~/dripd && sudo cp -v ~/dripd /usr/bin && sudo cp -vn ~/dripd.conf /etc && sudo cp -v ~/dripd.service /etc/systemd/system && sudo systemctl restart dripd ; systemctl status dripd'
 }
 
 all() {
     build
+
     deploy
 }
 
