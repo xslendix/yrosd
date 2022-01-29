@@ -37,15 +37,10 @@ target_link_libraries(dripd PRIVATE Threads::Threads)
 find_package(OpenCV)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-set(WPI_PATH ${CMAKE_CURRENT_LIST_DIR}/vendor/WiringPi/wiringPi)
+find_package(wiringPi)
+include_directories(${wiringPi_INCLUDE_DIRS})
 
-include_directories(include ${WPI_PATH})
-find_library(WPI_LIB wiringPi HINTS ${WPI_PATH} NO_CMAKE_FIND_ROOT_PATH)
-if(NOT WPI_LIB)
-    message(FATAL_ERROR "WiringPi library not found")
-endif()
-
-target_link_libraries(dripd PRIVATE ${OpenCV_LIBS} ${pigpio_LIBS})
+target_link_libraries(dripd PRIVATE ${OpenCV_LIBS} ${pigpio_LIBS} ${wiringPi_LIBS})
 
 # Set the directories that should be included in the build command for this target
 # when running g++ these will be included as -I/directory/path/
