@@ -37,12 +37,12 @@ int main(int argc, char* argv[])
         .implicit_value(true);
 
     args.add_argument("-r", "--reload")
-        .help("reload the first dripd process")
+        .help("reload the first yrosd process")
         .default_value(false)
         .implicit_value(true);
 
     args.add_argument("-s", "--stop")
-        .help("stop the first dripd process")
+        .help("stop the first yrosd process")
         .default_value(false)
         .implicit_value(true);
 
@@ -57,13 +57,13 @@ int main(int argc, char* argv[])
 #pragma endregion
 
     if (args["reload"] == true) {
-        pid_t pid = Processes::getProcIdByName("dripd");
+        pid_t pid = Processes::getProcIdByName("yrosd");
         kill(pid, 1);
         return EXIT_SUCCESS;
     }
 
     if (args["stop"] == true) {
-        pid_t pid = Processes::getProcIdByName("dripd");
+        pid_t pid = Processes::getProcIdByName("yrosd");
         kill(pid, SIGTERM);
         return EXIT_SUCCESS;
     }

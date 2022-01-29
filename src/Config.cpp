@@ -318,10 +318,10 @@ toml::table get_configuration_file_data()
 string get_configuration_file_path()
 {
     const string paths[] = {
-        "/etc/dripd.conf",
-        "/usr/local/etc/dripd.conf",
-        "dripd.conf",
-        "../dripd.conf",
+        "/etc/yrosd.conf",
+        "/usr/local/etc/yrosd.conf",
+        "yrosd.conf",
+        "../yrosd.conf",
     };
 
     string filepath;

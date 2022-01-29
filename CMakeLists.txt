@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -lstdc++")
 
 # Set the project name
-project(dripd)
+project(yrosd)
 
 # Create a sources variable with a link to all cpp files to compile
 set(SOURCES
@@ -29,10 +29,10 @@ set(SOURCES
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Add an executable with the above sources
-add_executable(dripd ${SOURCES})
+add_executable(yrosd ${SOURCES})
 
 find_package(Threads REQUIRED)
-target_link_libraries(dripd PRIVATE Threads::Threads)
+target_link_libraries(yrosd PRIVATE Threads::Threads)
 
 find_package(OpenCV)
 include_directories(${OpenCV_INCLUDE_DIRS})
@@ -40,11 +40,11 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 find_package(wiringPi)
 include_directories(${wiringPi_INCLUDE_DIRS})
 
-target_link_libraries(dripd PRIVATE ${OpenCV_LIBS} ${pigpio_LIBS} ${wiringPi_LIBS})
+target_link_libraries(yrosd PRIVATE ${OpenCV_LIBS} ${pigpio_LIBS} ${wiringPi_LIBS})
 
 # Set the directories that should be included in the build command for this target
 # when running g++ these will be included as -I/directory/path/
-target_include_directories(dripd
+target_include_directories(yrosd
     PRIVATE
     ${PROJECT_SOURCE_DIR}/include
     ${PROJECT_SOURCE_DIR}/vendor/cpp-mjpeg-streamer/include
