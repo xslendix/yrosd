@@ -40,7 +40,9 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 find_package(wiringPi)
 include_directories(${wiringPi_INCLUDE_DIRS})
 
-target_link_libraries(yrosd PRIVATE ${OpenCV_LIBS} ${pigpio_LIBS} ${wiringPi_LIBS})
+find_package(spdlog REQUIRED)
+
+target_link_libraries(yrosd PRIVATE ${OpenCV_LIBS} ${pigpio_LIBS} ${wiringPi_LIBS} spdlog::spdlog)
 
 # Set the directories that should be included in the build command for this target
 # when running g++ these will be included as -I/directory/path/
