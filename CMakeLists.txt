@@ -34,7 +34,7 @@ add_executable(yrosd ${SOURCES})
 find_package(Threads REQUIRED)
 target_link_libraries(yrosd PRIVATE Threads::Threads)
 
-find_package(OpenCV COMPONENTS core imgcodecs)
+find_package(OpenCV COMPONENTS core imgcodecs videoio)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 find_package(wiringPi)
