@@ -52,3 +52,6 @@ target_include_directories(yrosd
     ${PROJECT_SOURCE_DIR}/vendor/spdlog/include
     ${PROJECT_SOURCE_DIR}/vendor/tomlplusplus/include
 )
+
+install(TARGETS yrosd DESTINATION bin)
+
