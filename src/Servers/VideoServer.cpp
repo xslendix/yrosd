@@ -6,7 +6,6 @@
 
 #include <opencv2/core/hal/interface.h>
 #include <opencv2/core/mat.hpp>
-#include <opencv2/imgcodecs.hpp>
 #include <opencv2/opencv.hpp>
 #include <nadjieb/mjpeg_streamer.hpp>
 
