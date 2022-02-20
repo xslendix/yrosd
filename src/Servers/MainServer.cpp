@@ -106,7 +106,7 @@ void Main::Run()
 
             if (FD_ISSET(sd, &readfds)) {
                 if ((valread = read(sd, buffer, 1024)) == 0) {
-sock_disconnect:
+                sock_disconnect:
                     getpeername(sd, (struct sockaddr*)&address, (socklen_t*)&addrlen);
                     spdlog::info("MainServer: Host disconnected: {}:{}", inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 

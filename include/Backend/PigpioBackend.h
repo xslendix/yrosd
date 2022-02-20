@@ -11,7 +11,8 @@ class PigpioBackend : public BaseBackend {
 public:
     PigpioBackend()
         : BaseBackend()
-    { }
+    {
+    }
 
     void init();
     void SetGPIOMode(u8 gpio, GpioMode mode);

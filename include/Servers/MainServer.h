@@ -11,14 +11,12 @@ public:
     void Stop();
 
 private:
-    enum class ResponseAction
-    {
+    enum class ResponseAction {
         None,
         Close,
     };
 
-    struct Response
-    {
+    struct Response {
         ResponseAction action;
         string response;
     };

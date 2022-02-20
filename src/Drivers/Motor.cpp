@@ -1,12 +1,15 @@
-#include "Application.h"
+#include <Application.h>
+#include <Backend/Backend.h>
 #include <Common.h>
 #include <Drivers/Motor.h>
-#include <Backend/Backend.h>
 
 namespace Driver {
 
-Motor::Motor(uint pwm_pin, uint dir_pin, uint enable_pin, uint flt_pin)\
-    : m_pwm(pwm_pin), m_flt(flt_pin), m_en(enable_pin), m_dir(dir_pin)
+Motor::Motor(uint pwm_pin, uint dir_pin, uint enable_pin, uint flt_pin)
+    : m_pwm(pwm_pin)
+    , m_flt(flt_pin)
+    , m_en(enable_pin)
+    , m_dir(dir_pin)
 {
     App::the().backend()->SetPullUpDown(m_flt, 2); // PUD_UP
     SetEnable(true);
@@ -40,6 +43,7 @@ bool Motor::GetFault()
 }
 
 Motor::~Motor()
-{ }
+{
+}
 
 }
