@@ -22,18 +22,15 @@ void App::run()
     spdlog::debug("Reached App::run()");
 
     std::thread main_server_thread(&Server::Main::run, m_main_server);
-    std::thread udp_server_thread(&Server::UDP::run, m_udp_server);
     std::thread video_server_thread(&Server::Video::run, m_video_server);
 
     main_server_thread.join();
-    udp_server_thread.join();
     video_server_thread.join();
 }
 
 void App::stop()
 {
     m_main_server.stop();
-    m_udp_server.stop();
     m_video_server.stop();
 }
 

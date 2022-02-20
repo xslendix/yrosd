@@ -18,7 +18,6 @@ public:
     static App& the();
 private:
     Server::Main m_main_server;
-    Server::UDP m_udp_server;
     Server::Video m_video_server;
 };
 

@@ -17,7 +17,6 @@ struct Server {
     string host = "0.0.0.0";
 
     int port = 9080;
-    int port_udp = 8092;
 };
 
 struct Motors {

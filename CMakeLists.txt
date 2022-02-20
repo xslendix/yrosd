@@ -21,7 +21,6 @@ set(SOURCES
     src/CommandParser.cpp
     src/Servers/Server.cpp
     src/Servers/MainServer.cpp
-    src/Servers/UDPServer.cpp
     src/Servers/VideoServer.cpp
     src/Signals.cpp
     src/Processes.cpp

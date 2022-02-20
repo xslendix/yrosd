@@ -113,7 +113,6 @@ void Configuration::reload(toml::table toml_data)
     m_server_config->host = toml_data["Server"]["Host"].value_or(m_server_config->host);
 
     m_server_config->port = toml_data["Server"]["Port"].value_or(m_server_config->port);
-    m_server_config->port_udp = toml_data["Server"]["UDPPort"].value_or(m_server_config->port_udp);
 
 #pragma endregion
 
