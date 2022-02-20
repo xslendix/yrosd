@@ -17,18 +17,22 @@ MotorDriver::MotorDriver(uint pwm_pin, uint dir_pin, uint enable_pin, uint flt_p
 
 void MotorDriver::SetSpeed(int speed)
 {
+    std::cout<<"MotorDriver::SetSpeed(" << speed << "): backward=";
+
     const int max_speed = 480;
 
-    bool forward = false;
+    bool backward = 0;
 
     if (speed < 0) {
         speed *= -1;
-        forward = 1;
+        backward = 1;
     }
 
     speed = speed > max_speed ? max_speed : speed;
 
-    App::the().backend()->SetGPIO(m_dir, forward);
+    std::cout << backward << ", speed=" << speed << std::endl;
+
+    App::the().backend()->SetGPIO(m_dir, backward);
     App::the().backend()->SetHardwarePWM(m_pwm, 20000, speed * 6250 / 3);
 }
 
