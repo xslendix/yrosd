@@ -27,3 +27,9 @@ using std::string_view;
 using std::stringstream;
 using std::unique_ptr;
 using std::vector;
+
+template<typename T>
+static T max(T x, T y)
+{
+    return x > y ? x : y;
+}
