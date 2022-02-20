@@ -6,7 +6,7 @@ namespace Driver {
 
 class MotorDriver {
 public:
-    MotorDriver(uint pwm_pin, uint dir_pin, uint enable_pin, uint flt_pin);
+    MotorDriver(uint pwm_pin, uint flt_pin, uint enable_pin, uint dir_pin);
 
     void SetSpeed(int speed);
     void SetEnable(bool enable);

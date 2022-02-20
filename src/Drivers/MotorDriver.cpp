@@ -6,7 +6,7 @@
 
 namespace Driver {
 
-MotorDriver::MotorDriver(uint pwm_pin, uint dir_pin, uint enable_pin, uint flt_pin)
+MotorDriver::MotorDriver(uint pwm_pin, uint flt_pin, uint enable_pin, uint dir_pin)
     : m_pwm(pwm_pin)
     , m_flt(flt_pin)
     , m_en(enable_pin)
