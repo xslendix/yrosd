@@ -225,17 +225,17 @@ void Configuration::reload(toml::table toml_data)
 
     if (validate_ip_address(m_server_config->host)) {
         Server temp_server_config;
-        spdlog::warn("Invalid IP address in the configuration, defaulting to {}.", temp_server_config.host);
+        spdlog::warn("Config: Invalid IP address in the configuration, defaulting to {}.", temp_server_config.host);
         m_server_config->host = temp_server_config.host;
     }
 
     if (m_server_config->port < 0 || m_server_config->port > 65535) {
-        spdlog::warn("Invalid port range for main server. Exiting...");
+        spdlog::warn("Config: Invalid port range for main server. Exiting...");
         std::exit(1);
     }
 
     if (m_server_config->port < 0 || m_server_config->port > 65535) {
-        spdlog::warn("Invalid port range for motors. Turning off motor control...");
+        spdlog::warn("Config: Invalid port range for motors. Turning off motor control...");
         m_motors_config->enabled = false;
     }
 
@@ -244,35 +244,35 @@ void Configuration::reload(toml::table toml_data)
 
     if (m_face_config->emotions) {
         if (m_gui_present == false) {
-            spdlog::warn("No X11 server running, disabling face emotions.");
+            spdlog::warn("Config: No X11 server running, disabling face emotions.");
             m_face_config->emotions = false;
         }
     }
 
     if (m_face_tracking_config->enabled) {
         if (!std::filesystem::exists("/dev/video" + std::to_string(m_face_tracking_config->head_camera))) {
-            spdlog::warn("Camera for Face Tracking not found! Turning off Face Tracking.");
+            spdlog::warn("Config: Camera for Face Tracking of id {} not found! Turning off Face Tracking.", m_face_tracking_config->head_camera);
             m_face_tracking_config->enabled = false;
         }
     }
 
     if (m_video_streaming_config->enabled) {
         if (m_video_streaming_config->port < 0 || m_video_streaming_config->port > 65535) {
-            spdlog::warn("Invalid port range for Video Streaming. Turning off video streaming.");
+            spdlog::warn("Config: Invalid port range for Video Streaming. Turning off video streaming.");
             m_video_streaming_config->enabled = false;
         }
     }
 
     if (m_video_streaming_config->enabled) {
         if (m_video_streaming_config->port == m_server_config->port) {
-            spdlog::warn("Port for Video Streaming is the same as the one for the main server! Turning off video streaming.");
+            spdlog::warn("Config: Port for Video Streaming is the same as the one for the main server! Turning off video streaming.");
             m_video_streaming_config->enabled = false;
         }
     }
 
     if (m_video_streaming_config->enabled) {
         if (!std::filesystem::exists("/dev/video" + std::to_string(m_video_streaming_config->camera))) {
-            spdlog::warn("Camera for Video Streaming not found! Turning off video streaming.");
+            spdlog::warn("Config: Camera for Video Streaming of id {} not found! Turning off video streaming.", m_video_streaming_config->camera);
             m_video_streaming_config->enabled = false;
         }
     }
@@ -308,7 +308,7 @@ toml::table get_configuration_file_data()
             std::exit(1);
         }
     } else
-        spdlog::warn("WARNING! Configuration file not found! Using default values.");
+        spdlog::warn("Config: WARNING! Configuration file not found! Using default values.");
 
     return config;
 }
@@ -331,7 +331,7 @@ string get_configuration_file_path()
         }
     }
 
-    spdlog::info("Config file path found: {}", filepath.empty() ? "NONE" : filepath);
+    spdlog::info("Config: Config file path found: {}", filepath.empty() ? "NONE" : filepath);
 
     return filepath;
 }

@@ -2,6 +2,7 @@
 #include <Backend/Backend.h>
 #include <Common.h>
 #include <Drivers/MotorDriver.h>
+#include <spdlog/spdlog.h>
 
 namespace Driver {
 
@@ -17,7 +18,7 @@ MotorDriver::MotorDriver(uint pwm_pin, uint dir_pin, uint enable_pin, uint flt_p
 
 void MotorDriver::SetSpeed(int speed)
 {
-    std::cout<<"MotorDriver::SetSpeed(" << speed << "): backward=";
+    spdlog::debug("MotorDriver::SetSpeed({})", speed);
 
     const int max_speed = 480;
 
@@ -28,9 +29,9 @@ void MotorDriver::SetSpeed(int speed)
         backward = 1;
     }
 
-    speed = speed > max_speed ? max_speed : speed;
+    speed = min(speed, max_speed);
 
-    std::cout << backward << ", speed=" << speed << std::endl;
+    spdlog::debug("    backward: {}, speed: {}", backward, speed);
 
     App::the().backend()->SetGPIO(m_dir, backward);
     App::the().backend()->SetHardwarePWM(m_pwm, 20000, speed * 6250 / 3);
