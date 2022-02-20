@@ -20,7 +20,7 @@ set(SOURCES
     src/Application.cpp
     src/CommandParser.cpp
     src/Backend/PigpioBackend.cpp
-    src/Drivers/Motor.cpp
+    src/Drivers/MotorDriver.cpp
     src/Servers/Server.cpp
     src/Servers/MainServer.cpp
     src/Servers/VideoServer.cpp

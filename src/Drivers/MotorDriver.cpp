@@ -1,11 +1,11 @@
 #include <Application.h>
 #include <Backend/Backend.h>
 #include <Common.h>
-#include <Drivers/Motor.h>
+#include <Drivers/MotorDriver.h>
 
 namespace Driver {
 
-Motor::Motor(uint pwm_pin, uint dir_pin, uint enable_pin, uint flt_pin)
+MotorDriver::MotorDriver(uint pwm_pin, uint dir_pin, uint enable_pin, uint flt_pin)
     : m_pwm(pwm_pin)
     , m_flt(flt_pin)
     , m_en(enable_pin)
@@ -15,7 +15,7 @@ Motor::Motor(uint pwm_pin, uint dir_pin, uint enable_pin, uint flt_pin)
     SetEnable(true);
 }
 
-void Motor::SetSpeed(int speed)
+void MotorDriver::SetSpeed(int speed)
 {
     const int max_speed = 480;
 
@@ -32,17 +32,17 @@ void Motor::SetSpeed(int speed)
     App::the().backend()->SetHardwarePWM(m_pwm, 20000, speed * 6250 / 3);
 }
 
-void Motor::SetEnable(bool enable)
+void MotorDriver::SetEnable(bool enable)
 {
     App::the().backend()->SetGPIO(m_en, enable);
 }
 
-bool Motor::GetFault()
+bool MotorDriver::GetFault()
 {
     return !App::the().backend()->GetGPIO(m_flt);
 }
 
-Motor::~Motor()
+MotorDriver::~MotorDriver()
 {
 }
 

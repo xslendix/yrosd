@@ -1,5 +1,7 @@
-#include <Config.h>
+#include <Application.h>
 #include <Common.h>
+#include <Config.h>
+#include <Drivers/MotorDriver.h>
 #include <Servers/MainServer.h>
 #include <String.h>
 
@@ -14,8 +16,26 @@
 
 namespace Server {
 
+// FIXME: This is very hackish. Find a better way to do this.
+Driver::MotorDriver* motor_left = nullptr;
+Driver::MotorDriver* motor_right = nullptr;
+
 void Main::Run()
 {
+    if (!motor_left || !motor_right) {
+        motor_left = new Driver::MotorDriver(
+            Configuration::the().motors()->back_left[0],
+            Configuration::the().motors()->back_left[1],
+            Configuration::the().motors()->back_left[2],
+            Configuration::the().motors()->back_left[3]);
+
+        motor_right = new Driver::MotorDriver(
+            Configuration::the().motors()->back_right[0],
+            Configuration::the().motors()->back_right[1],
+            Configuration::the().motors()->back_right[2],
+            Configuration::the().motors()->back_right[3]);
+    }
+
     int opt = true;
     int master_socket, addrlen, new_socket, client_socket[30],
         max_clients = 30, activity, i, valread, sd;
@@ -150,12 +170,34 @@ Main::Response Main::ParseInstruction(string instruction)
         if (tokens.size() < 1)
             continue;
 
-        if (tokens[0] == "PING")
+        if (tokens[0] == "PING") {
             return { ResponseAction::None, STATUS_OK };
-        else if (tokens[0] == "CLOSE" || tokens[0] == "EXIT")
+        } else if (tokens[0] == "CLOSE" || tokens[0] == "EXIT") {
             return { ResponseAction::Close, STATUS_OK };
-        else
+        } else if (tokens[0] == "MOTOR") {
+            if (tokens.size() < 3)
+                return { ResponseAction::None, STATUS_ERR };
+
+            if (tokens[1] == "LEFT") {
+                try {
+                    motor_left->SetSpeed(stoi(tokens[2]));
+                } catch (...) {
+                    return { ResponseAction::None, STATUS_ERR };
+                }
+            } else if (tokens[1] == "RIGHT") {
+                try {
+                    motor_right->SetSpeed(stoi(tokens[2]));
+                } catch (...) {
+                    return { ResponseAction::None, STATUS_ERR };
+                }
+            } else {
+                return { ResponseAction::None, STATUS_ERR };
+            }
+
+            return { ResponseAction::None, STATUS_OK };
+        } else {
             return { ResponseAction::None, STATUS_ERR };
+        }
     }
 
     return {

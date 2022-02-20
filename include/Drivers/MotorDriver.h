@@ -4,16 +4,16 @@
 
 namespace Driver {
 
-class Motor {
+class MotorDriver {
 public:
-    Motor(uint pwm_pin, uint dir_pin, uint enable_pin, uint flt_pin);
+    MotorDriver(uint pwm_pin, uint dir_pin, uint enable_pin, uint flt_pin);
 
     void SetSpeed(int speed);
     void SetEnable(bool enable);
 
     bool GetFault();
 
-    ~Motor();
+    ~MotorDriver();
 
 private:
     u8 m_pwm, m_flt, m_en, m_dir;
