@@ -5,3 +5,5 @@ vendor/opencv*
 .vscode
 toolchain-rpi.cmake
 settings.sh
+.cache
+cmake

@@ -8,6 +8,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -lstdc++")
 
+set(EXPORT_COMPILE_COMMANDS ON)
+
 # Set the project name
 project(yrosd)
 
@@ -28,21 +30,24 @@ set(SOURCES
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
 # Add an executable with the above sources
 add_executable(yrosd ${SOURCES})
 
+install(TARGETS yrosd DESTINATION bin)
+
 find_package(Threads REQUIRED)
-target_link_libraries(yrosd PRIVATE Threads::Threads)
 
 find_package(OpenCV COMPONENTS core imgcodecs videoio)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-find_package(wiringPi)
-include_directories(${wiringPi_INCLUDE_DIRS})
+find_package(pigpio)
+include_directories(${pigpio_INCLUDE_DIRS})
 
 find_package(spdlog REQUIRED)
 
-target_link_libraries(yrosd PRIVATE ${OpenCV_LIBS} ${pigpio_LIBS} ${wiringPi_LIBS} spdlog::spdlog)
+target_link_libraries(yrosd PRIVATE Threads::Threads ${OpenCV_LIBS} ${pigpio_LIBS} spdlog::spdlog)
 
 # Set the directories that should be included in the build command for this target
 # when running g++ these will be included as -I/directory/path/
@@ -54,6 +59,4 @@ target_include_directories(yrosd
     ${PROJECT_SOURCE_DIR}/vendor/spdlog/include
     ${PROJECT_SOURCE_DIR}/vendor/tomlplusplus/include
 )
-
-install(TARGETS yrosd DESTINATION bin)
 

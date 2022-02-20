@@ -4,9 +4,9 @@
 
 namespace Backend {
 
-class Backend {
+class BaseBackend {
 public:
-    Backend() {
+    BaseBackend() {
         init();
     }
 
@@ -39,6 +39,10 @@ public:
     virtual void SetHardwarePWM(u8 gpio, uint pwm, uint pwm_duty)
     {
         spdlog::debug("Backend: GPIO hardware PWM change requested: {}, {} for {}", pwm, pwm_duty, gpio);
+    }
+
+    virtual ~BaseBackend() {
+        spdlog::debug("Backend: Terminating.");
     }
 };
 
