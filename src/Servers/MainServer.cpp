@@ -180,13 +180,13 @@ Main::Response Main::ParseInstruction(string instruction)
 
             if (tokens[1] == "LEFT") {
                 try {
-                    motor_left->SetSpeed(stoi(tokens[2]));
+                    motor_left->SetSpeed(stoi(tokens[2]) * (Configuration::the().motors()->left_inverted ? -1 : 1));
                 } catch (...) {
                     return { ResponseAction::None, STATUS_ERR };
                 }
             } else if (tokens[1] == "RIGHT") {
                 try {
-                    motor_right->SetSpeed(stoi(tokens[2]));
+                    motor_right->SetSpeed(stoi(tokens[2]) * (Configuration::the().motors()->right_inverted ? -1 : 1));
                 } catch (...) {
                     return { ResponseAction::None, STATUS_ERR };
                 }
