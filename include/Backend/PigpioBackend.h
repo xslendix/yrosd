@@ -12,6 +12,7 @@ public:
     PigpioBackend()
         : BaseBackend()
     {
+        init();
     }
 
     void init();

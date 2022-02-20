@@ -22,13 +22,13 @@ void App::Run()
 {
     spdlog::debug("Reached App::Run()");
 
-    std::thread main_server_thread(&Server::Main::Run, m_main_server);
-    std::thread video_server_thread(&Server::Video::Run, m_video_server);
-
     if (!m_backend) {
         unique_ptr<Backend::BaseBackend> new_backend(std::make_unique<Backend::Backend>());
         m_backend = std::move(new_backend);
     }
+
+    std::thread main_server_thread(&Server::Main::Run, m_main_server);
+    std::thread video_server_thread(&Server::Video::Run, m_video_server);
 
     main_server_thread.join();
     video_server_thread.join();
