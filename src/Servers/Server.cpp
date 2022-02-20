@@ -2,12 +2,12 @@
 
 namespace Server {
 
-void Server::run()
+void Server::Run()
 {
     m_running = true;
 };
 
-void Server::stop()
+void Server::Stop()
 {
     m_running = false;
 };

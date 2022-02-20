@@ -4,9 +4,9 @@ namespace Server {
 
 class Server {
 public:
-    virtual void run();
+    virtual void Run();
 
-    virtual void stop();
+    virtual void Stop();
 
 protected:
     bool m_running = false;

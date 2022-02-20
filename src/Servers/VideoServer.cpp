@@ -1,4 +1,3 @@
-#include "spdlog/spdlog.h"
 #include <Servers/VideoServer.h>
 
 #include <Common.h>
@@ -15,14 +14,14 @@ namespace Server {
 
 void Video::run()
 {
-    Server::run();
+    Server::Run();
 
     if (!Configuration::the().video_streaming()->enabled)
         return;
 
     cv::VideoCapture camera(Configuration::the().video_streaming()->camera);
     if (!camera.isOpened()) {
-        spdlog::error("Failed opening camera index {}. Video streaming disabled.",
+        spdlog::error("VideoServer: Failed opening camera index {}. Video streaming disabled.",
             Configuration::the().video_streaming()->camera);
         Configuration::the().video_streaming()->enabled = false;
         m_running = false;
@@ -38,23 +37,21 @@ void Video::run()
         Configuration::the().video_streaming()->jpeg_quality
     };
 
-    spdlog::info("Video server started. Awaiting connections on port {} using camera index {}.",
+    spdlog::info("VideoServer: Awaiting connections on port {} using camera index {}.",
         Configuration::the().video_streaming()->port,
         Configuration::the().video_streaming()->camera);
 
     while (streamer.isAlive()) {
         if (m_running == false) {
-            spdlog::info("Stopping video server...");
+            spdlog::info("VideoServer: Stopping...");
             streamer.stop();
             break;
         }
 
         cv::Mat frame;
         camera >> frame;
-        if (frame.empty()) {
-            spdlog::debug("Frame empty. Skipping.");
+        if (frame.empty())
             continue;
-        }
 
         std::vector<uchar> buffer_bgr;
         cv::imencode(".jpg", frame, buffer_bgr, params);

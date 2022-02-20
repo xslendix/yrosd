@@ -21,8 +21,8 @@ void App::run()
 {
     spdlog::debug("Reached App::run()");
 
-    std::thread main_server_thread(&Server::Main::run, m_main_server);
-    std::thread video_server_thread(&Server::Video::run, m_video_server);
+    std::thread main_server_thread(&Server::Main::Run, m_main_server);
+    std::thread video_server_thread(&Server::Video::Run, m_video_server);
 
     main_server_thread.join();
     video_server_thread.join();
@@ -30,8 +30,8 @@ void App::run()
 
 void App::stop()
 {
-    m_main_server.stop();
-    m_video_server.stop();
+    m_main_server.Stop();
+    m_video_server.Stop();
 }
 
 }
