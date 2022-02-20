@@ -19,6 +19,8 @@ set(SOURCES
     src/Config.cpp
     src/Application.cpp
     src/CommandParser.cpp
+    src/Backend/PigpioBackend.cpp
+    src/Drivers/Motor.cpp
     src/Servers/Server.cpp
     src/Servers/MainServer.cpp
     src/Servers/VideoServer.cpp
@@ -46,7 +48,7 @@ include_directories(${pigpio_INCLUDE_DIRS})
 
 find_package(spdlog REQUIRED)
 
-target_link_libraries(yrosd PRIVATE Threads::Threads ${OpenCV_LIBS} ${pigpio_LIBS} spdlog::spdlog)
+target_link_libraries(yrosd PRIVATE Threads::Threads ${OpenCV_LIBS} ${pigpio_LIBS} spdlog::spdlog ${pigpio_LIBRARY})
 
 # Set the directories that should be included in the build command for this target
 # when running g++ these will be included as -I/directory/path/

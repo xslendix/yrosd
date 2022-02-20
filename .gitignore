@@ -6,4 +6,3 @@ vendor/opencv*
 toolchain-rpi.cmake
 settings.sh
 .cache
-cmake

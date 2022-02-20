@@ -19,7 +19,7 @@ void PigpioBackend::init()
 
 void PigpioBackend::SetGPIOMode(u8 gpio, GpioMode mode)
 {
-    spdlog::debug("PigpioBackend: GPIO mode requested: {} for {}.", mode, gpio);
+    spdlog::debug("PigpioBackend: GPIO mode requested: {} for {}.", (uint)mode, gpio);
     gpioSetMode(gpio, (uint)mode);
 }
 

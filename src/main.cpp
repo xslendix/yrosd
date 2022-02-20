@@ -83,10 +83,10 @@ int main(int argc, char* argv[])
     if (args["test"] == false) {
         if (args["daemonize"] == true) {
             if (fork() == 0) {
-                App::the().run();
+                App::the().Run();
             }
         } else {
-            App::the().run();
+            App::the().Run();
         }
     }
 

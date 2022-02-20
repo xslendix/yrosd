@@ -10,7 +10,7 @@ namespace Backend {
 #endif
 
 #if PREFERRED_BACKEND == pigpio
-using the = PigpioBackend;
+using Backend = PigpioBackend;
 #endif
 
 }

@@ -19,7 +19,7 @@ void reload_signal_handler(int signum)
 void clean_exit(int signum)
 {
     spdlog::info("Got kill signal, exiting...");
-    Application::App::the().stop();
+    Application::App::the().Stop();
     std::this_thread::sleep_for(1s);
     exit(EXIT_FAILURE);
 }

@@ -1,8 +1,9 @@
-#include <thread>
-
 #include <Application.h>
 #include <Common.h>
 #include <Servers/Servers.h>
+#include <Backend/Backend.h>
+
+#include <thread>
 
 namespace Application {
 
@@ -17,18 +18,23 @@ App& App::the()
     return *s_the;
 }
 
-void App::run()
+void App::Run()
 {
-    spdlog::debug("Reached App::run()");
+    spdlog::debug("Reached App::Run()");
 
     std::thread main_server_thread(&Server::Main::Run, m_main_server);
     std::thread video_server_thread(&Server::Video::Run, m_video_server);
+
+    if (!m_backend) {
+        unique_ptr<Backend::BaseBackend> new_backend(std::make_unique<Backend::Backend>());
+        m_backend = std::move(new_backend);
+    }
 
     main_server_thread.join();
     video_server_thread.join();
 }
 
-void App::stop()
+void App::Stop()
 {
     m_main_server.Stop();
     m_video_server.Stop();
