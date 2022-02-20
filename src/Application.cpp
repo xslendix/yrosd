@@ -1,7 +1,7 @@
 #include <thread>
 
-#include <Common.h>
 #include <Application.h>
+#include <Common.h>
 #include <Servers/Servers.h>
 
 namespace Application {

@@ -5,6 +5,7 @@
 
 namespace Backend {
 
-class Simple : public BaseBackend { };
+class Simple : public BaseBackend {
+};
 
 }

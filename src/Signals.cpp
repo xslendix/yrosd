@@ -11,7 +11,7 @@ using namespace std::chrono_literals;
 
 void reload_signal_handler(int signum)
 {
-    (void) signum;
+    (void)signum;
     spdlog::info("Reloading configuration file...");
     Configuration::the().reload();
 }

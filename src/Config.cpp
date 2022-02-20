@@ -1,11 +1,10 @@
 #include <Common.h>
+#include <Config.h>
 
 #include <filesystem>
 #include <arpa/inet.h>
 
 #include <toml++/toml.h>
-
-#include <Config.h>
 
 namespace Config {
 

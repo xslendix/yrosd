@@ -23,7 +23,7 @@ struct Motors {
     bool enabled = false;
 
     int back_left[4] = { 12, 5, 22, 24 };
-    int back_right[4] = { 13, 6 , 23, 25};
+    int back_right[4] = { 13, 6, 23, 25 };
     int front_left[4] = { 0 };
     int front_right[4] = { 0 };
 
@@ -92,38 +92,37 @@ struct VideoStreaming {
 
 #pragma endregion
 
-class Configuration
-{
+class Configuration {
 public:
     Configuration(toml::table toml_data);
 
     void reload(toml::table toml_data);
     void reload();
 
-    Server* server() const { return m_server_config; }    
-    Motors* motors() const { return m_motors_config; }    
-    Head* head() const { return m_head_config; }    
-    Hand* hand() const { return m_hand_config; }    
-    Wrtists* wrists() const { return m_wrists_config; }    
-    FaceTracking* face_tracking() const { return m_face_tracking_config; }    
-    Face* face() const { return m_face_config; }    
-    VideoStreaming* video_streaming() const { return m_video_streaming_config; }    
+    Server* server() const { return m_server_config; }
+    Motors* motors() const { return m_motors_config; }
+    Head* head() const { return m_head_config; }
+    Hand* hand() const { return m_hand_config; }
+    Wrtists* wrists() const { return m_wrists_config; }
+    FaceTracking* face_tracking() const { return m_face_tracking_config; }
+    Face* face() const { return m_face_config; }
+    VideoStreaming* video_streaming() const { return m_video_streaming_config; }
 
-    bool gui_present() const { return m_gui_present; }    
+    bool gui_present() const { return m_gui_present; }
 
     string as_printable_string();
 
     static Configuration& the();
 
 private:
-    Server *m_server_config = new Server;
-    Motors *m_motors_config = new Motors;
-    Head *m_head_config = new Head;
-    Hand *m_hand_config = new Hand;
-    Wrtists *m_wrists_config = new Wrtists;
-    FaceTracking *m_face_tracking_config = new FaceTracking;
-    Face *m_face_config = new Face;
-    VideoStreaming *m_video_streaming_config = new VideoStreaming;
+    Server* m_server_config = new Server;
+    Motors* m_motors_config = new Motors;
+    Head* m_head_config = new Head;
+    Hand* m_hand_config = new Hand;
+    Wrtists* m_wrists_config = new Wrtists;
+    FaceTracking* m_face_tracking_config = new FaceTracking;
+    Face* m_face_config = new Face;
+    VideoStreaming* m_video_streaming_config = new VideoStreaming;
 
     bool m_gui_present = false;
 };
@@ -131,4 +130,3 @@ private:
 }
 
 using Config::Configuration;
-

@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
 
     Configuration::the();
 
-    if(args["test"] == false) {
+    if (args["test"] == false) {
         if (args["daemonize"] == true) {
             if (fork() == 0) {
                 App::the().run();

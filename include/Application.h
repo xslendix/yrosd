@@ -1,10 +1,9 @@
 #pragma once
 
+#include <Backend/Backend.h>
 #include <Common.h>
 #include <Config.h>
 #include <Servers/Servers.h>
-
-#include <Backend/Backend.hpp>
 
 #include <thread>
 
@@ -16,6 +15,7 @@ public:
     void stop();
 
     static App& the();
+
 private:
     Server::Main m_main_server;
     Server::Video m_video_server;

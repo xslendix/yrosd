@@ -4,7 +4,6 @@
 
 class CommandParser {
 public:
-    void parse(string &command);
+    void parse(string& command);
     static CommandParser& the();
-
 };

@@ -5,11 +5,9 @@
 
 #include <pigpio.h>
 
-namespace Backend
-{
+namespace Backend {
 
-class PigpioBackend : public BaseBackend
-{
+class PigpioBackend : public BaseBackend {
 public:
     enum class GpioMode {
         Input = 0,

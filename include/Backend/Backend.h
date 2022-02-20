@@ -6,7 +6,7 @@
 namespace Backend {
 
 #ifndef PREFERRED_BACKEND
-#define PREFERRED_BACKEND pigpio
+#    define PREFERRED_BACKEND pigpio
 #endif
 
 #if PREFERRED_BACKEND == pigpio

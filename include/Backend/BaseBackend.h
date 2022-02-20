@@ -6,7 +6,8 @@ namespace Backend {
 
 class BaseBackend {
 public:
-    BaseBackend() {
+    BaseBackend()
+    {
         init();
     }
 
@@ -41,7 +42,8 @@ public:
         spdlog::debug("Backend: GPIO hardware PWM change requested: {}, {} for {}", pwm, pwm_duty, gpio);
     }
 
-    virtual ~BaseBackend() {
+    virtual ~BaseBackend()
+    {
         spdlog::debug("Backend: Terminating.");
     }
 };
