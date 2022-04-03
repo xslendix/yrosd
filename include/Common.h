@@ -21,6 +21,7 @@ const unsigned int PATCH_VERSION = 1;
 inline const std::string get_version_number() { return fmt::format("{}.{}.{}", MAJOR_VERSION, MINOR_VERSION, PATCH_VERSION); }
 
 using std::ifstream;
+using std::ofstream;
 using std::shared_ptr;
 using std::string;
 using std::string_view;

@@ -1,6 +1,7 @@
 #include <Application.h>
 #include <Common.h>
 #include <Config.h>
+#include <Messaging.h>
 #include <Drivers/MotorDriver.h>
 #include <Servers/MainServer.h>
 #include <String.h>
@@ -195,6 +196,18 @@ Main::Response Main::ParseInstruction(string instruction)
             }
 
             return { ResponseAction::None, STATUS_OK };
+        } else if (Configuration::the().gui_present() && (tokens[0] == "FACE" || tokens[0] == "F")) {
+            if (tokens.size() < 2)
+                return { ResponseAction::None, STATUS_ERR };
+            
+            try {
+                int face = stoi(tokens[1]);
+                if (face < 0)
+                    return { ResponseAction::None, STATUS_ERR };
+                Messaging::SendMessage("face " + tokens[1]);
+            } catch (...) {
+                return { ResponseAction::None, STATUS_ERR };
+            }
         } else {
             return { ResponseAction::None, STATUS_ERR };
         }
