@@ -10,6 +10,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -lstdc++")
 
 set(EXPORT_COMPILE_COMMANDS ON)
 
+option(USE_GUI "Use GUI" OFF)
 # Set the project name
 project(yrosd)
 
