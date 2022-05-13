@@ -19,6 +19,8 @@ set(SOURCES
     src/Config.cpp
     src/Application.cpp
     src/CommandParser.cpp
+    src/Messaging.cpp
+    src/Backend/SimpleBackend.cpp
     src/Backend/PigpioBackend.cpp
     src/Drivers/MotorDriver.cpp
     src/Servers/Server.cpp
@@ -44,11 +46,23 @@ find_package(OpenCV COMPONENTS core imgcodecs videoio)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 find_package(pigpio)
-include_directories(${pigpio_INCLUDE_DIRS})
+if(${PIGPIO_FOUND})
+    include_directories(${pigpio_INCLUDE_DIRS})
+    set(LIBS ${pigpio_LIBS} ${pigpio_LIBRARY})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPREFERRED_BACKEND=2")
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DPREFERRED_BACKEND=1")
+endif()
 
 find_package(spdlog REQUIRED)
 
-target_link_libraries(yrosd PRIVATE Threads::Threads ${OpenCV_LIBS} ${pigpio_LIBS} spdlog::spdlog ${pigpio_LIBRARY})
+set(LIBS Threads::Threads ${OpenCV_LIBS} spdlog::spdlog ${LIBS})
+
+if(USE_GUI)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUSE_GUI")
+endif(USE_GUI)
+
+target_link_libraries(yrosd PRIVATE ${LIBS})
 
 # Set the directories that should be included in the build command for this target
 # when running g++ these will be included as -I/directory/path/

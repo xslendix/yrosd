@@ -1,8 +1,11 @@
-#include <Backend/PigpioBackend.h>
-#include <Common.h>
-#include <Signals.h>
+#if PREFERRED_BACKEND == 2
 
-#include <pigpio.h>
+#    include <Backend/PigpioBackend.h>
+
+#    include <Common.h>
+#    include <Signals.h>
+
+#    include <pigpio.h>
 
 namespace Backend {
 
@@ -55,3 +58,5 @@ PigpioBackend::~PigpioBackend()
 }
 
 }
+
+#endif
