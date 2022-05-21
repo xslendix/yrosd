@@ -28,10 +28,13 @@ void App::Run()
     }
 
     std::thread main_server_thread(&Server::Main::Run, m_main_server);
+
     std::thread video_server_thread(&Server::Video::Run, m_video_server);
 
-    main_server_thread.join();
+    spdlog::info("Starting video...");
     video_server_thread.join();
+    spdlog::info("Starting main...");
+    main_server_thread.join();
 }
 
 void App::Stop()

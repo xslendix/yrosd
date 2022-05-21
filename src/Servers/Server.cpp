@@ -1,5 +1,7 @@
 #include <Servers/Server.h>
 
+#include <spdlog/spdlog.h>
+
 namespace Server {
 
 void Server::Run()

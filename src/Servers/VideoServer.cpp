@@ -12,12 +12,14 @@ using nadjieb::MJPEGStreamer;
 
 namespace Server {
 
-void Video::run()
+void Video::Run()
 {
     Server::Run();
 
-    if (!Configuration::the().video_streaming()->enabled)
+    if (Configuration::the().video_streaming()->enabled == false)
         return;
+
+    spdlog::info("VideoServer: Initialising...");
 
     cv::VideoCapture camera(Configuration::the().video_streaming()->camera);
     if (!camera.isOpened()) {

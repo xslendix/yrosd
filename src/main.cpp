@@ -56,6 +56,8 @@ int main(int argc, char* argv[])
 
 #pragma endregion
 
+#pragma region Argument parsing
+
     if (args["reload"] == true) {
         pid_t pid = Processes::getProcIdByName("yrosd");
         kill(pid, 1);
@@ -75,6 +77,8 @@ int main(int argc, char* argv[])
 
     if (args["verbose"] == true)
         spdlog::set_level(spdlog::level::debug);
+
+#pragma endregion
 
     initialize_signals();
 
