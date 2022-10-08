@@ -27,6 +27,8 @@ public:
         spdlog::debug("Backend: Initializing.");
     }
 
+#pragma region GPIO
+
     virtual void SetGPIOMode(u8 gpio, GpioMode mode)
     {
         spdlog::debug("Backend: GPIO mode requested: {} for {}.", (uint)mode, gpio);
@@ -52,6 +54,48 @@ public:
     {
         spdlog::debug("Backend: GPIO hardware PWM change requested: {}, {} for {}", pwm, pwm_duty, gpio);
     }
+
+#pragma endregion
+
+#pragma region I2C
+
+    virtual int OpenI2C(uint bus, uint address, uint flags)
+    {
+        spdlog::debug("Backend: I2C open requested: bus {}, address {}, flags {}.", bus, address, flags);
+        return 0;
+    }
+
+    virtual bool CloseI2C(uint handle)
+    {
+        spdlog::debug("Backend: I2C close requested: handle {}.", handle);
+        return true;
+    }
+
+    virtual u8 I2CReadByte(uint handle)
+    {
+        spdlog::debug("Backend: I2C read byte requested: handle {}.", handle);
+        return 0;
+    }
+
+    virtual bool I2CWriteByte(uint handle, u8 data)
+    {
+        spdlog::debug("Backend: I2C write byte requested: handle {}, data {}.", handle, data);
+        return true;
+    }
+
+    virtual uint I2CReadByteData(uint handle, uint reg)
+    {
+        spdlog::debug("Backend: I2C read byte data requested: handle {}, reg {}.", handle, reg);
+        return 0;
+    }
+
+    virtual bool I2CWriteByteData(uint handle, uint reg, u8 data)
+    {
+        spdlog::debug("Backend: I2C write byte data requested: handle {}, reg {}, data {}.", handle, reg, data);
+        return true;
+    }
+
+#pragma endregion
 
     virtual ~BaseBackend()
     {

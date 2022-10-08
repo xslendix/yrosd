@@ -24,6 +24,7 @@ set(SOURCES
     src/Backend/SimpleBackend.cpp
     src/Backend/PigpioBackend.cpp
     src/Drivers/MotorDriver.cpp
+    src/Drivers/PWMServo.cpp
     src/Servers/Server.cpp
     src/Servers/MainServer.cpp
     src/Servers/VideoServer.cpp

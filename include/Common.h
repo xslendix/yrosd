@@ -1,6 +1,5 @@
 #pragma once
 
-#include <bits/stdint-uintn.h>
 #include <csignal>
 #include <cstdlib>
 #include <fstream>
@@ -13,6 +12,8 @@
 #include <spdlog/spdlog.h>
 
 typedef uint8_t u8;
+typedef uint16_t u16;
+typedef uint32_t u32;
 
 const unsigned int MAJOR_VERSION = 0;
 const unsigned int MINOR_VERSION = 0;
