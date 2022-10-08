@@ -5,11 +5,12 @@
 
 namespace Messaging {
 
-void SendMessage(string const& message)
+void
+SendMessage(string const& message)
 {
-    auto file = ofstream(std::filesystem::temp_directory_path() / "yros_comm");
-    file << message;
-    file.close();
+  auto file = ofstream(std::filesystem::temp_directory_path() / "yros_comm");
+  file << message;
+  file.close();
 }
 
 }

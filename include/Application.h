@@ -20,6 +20,7 @@ public:
 
 private:
     Server::Main m_main_server;
+    Server::Face m_face_server;
     Server::Video m_video_server;
 
     unique_ptr<Backend::BaseBackend> m_backend;

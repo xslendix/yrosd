@@ -27,6 +27,7 @@ set(SOURCES
     src/Drivers/PWMServo.cpp
     src/Servers/Server.cpp
     src/Servers/MainServer.cpp
+    src/Servers/FaceServer.cpp
     src/Servers/VideoServer.cpp
     src/Signals.cpp
     src/Processes.cpp
@@ -44,7 +45,7 @@ install(TARGETS yrosd DESTINATION bin)
 
 find_package(Threads REQUIRED)
 
-find_package(OpenCV COMPONENTS core imgcodecs videoio)
+find_package(OpenCV COMPONENTS core imgcodecs videoio objdetect)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
 find_package(pigpio)
@@ -65,6 +66,12 @@ if(USE_GUI)
 endif(USE_GUI)
 
 target_link_libraries(yrosd PRIVATE ${LIBS})
+
+add_custom_command(
+        TARGET yrosd POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_SOURCE_DIR}/haarcascade_frontalface_default.xml
+                ${CMAKE_CURRENT_BINARY_DIR}/haarcascade_frontalface_default.xml)
 
 # Set the directories that should be included in the build command for this target
 # when running g++ these will be included as -I/directory/path/

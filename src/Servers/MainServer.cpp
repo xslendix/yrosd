@@ -165,69 +165,96 @@ const string STATUS_ERR_OPTION_UNAVAILABLE = "ERR UNV\r\n";
 const string STATUS_ERR_UNKNOWN = "ERR UNK\r\n";
 const string STATUS_ERR_MOTOR_FAIL = "ERR MOT_FAIL\r\n";
 
-Main::Response Main::ParseInstruction(string instruction)
+Main::Response
+Main::ParseInstruction(string instruction)
 {
-    auto lines = split(instruction, "\r\n");
+  auto lines = split(instruction, "\r\n");
 
-    for (auto line : lines) {
+  for (auto line : lines) {
+    for (auto& c : line)
+      c = toupper(c);
 
-        for (auto& c : line)
-            c = toupper(c);
+    if (line.empty())
+      continue;
 
-        if (line.empty())
-            continue;
+    auto tokens = split(line, " ");
 
-        auto tokens = split(line, " ");
+    if (tokens.size() < 1)
+      continue;
 
-        if (tokens.size() < 1)
-            continue;
+    if (tokens[0] == "PING" || tokens[0] == "P") {
+      return { ResponseAction::None, STATUS_ACK };
+    } else if (tokens[0] == "CLOSE" || tokens[0] == "EXIT" || tokens[0] == "QUIT" || tokens[0] == "Q") {
+      return { ResponseAction::Close, STATUS_ACK };
+    } else if (tokens[0] == "MOTOR" || tokens[0] == "M") {
+      if (tokens.size() < 3)
+        return { ResponseAction::None, STATUS_ERR_INVALID_OPTIONS };
 
-        if (tokens[0] == "PING" || tokens[0] == "P") {
-            return { ResponseAction::None, STATUS_ACK };
-        } else if (tokens[0] == "CLOSE" || tokens[0] == "EXIT" || tokens[0] == "QUIT" || tokens[0] == "Q") {
-            return { ResponseAction::Close, STATUS_ACK };
-        } else if (tokens[0] == "MOTOR" || tokens[0] == "M") {
-            if (tokens.size() < 3)
-                return { ResponseAction::None, STATUS_ERR_INVALID_OPTIONS };
-
-            if (tokens[1] == "LEFT" || tokens[1] == "L") {
-                try {
-                    motor_left->SetSpeed(stoi(tokens[2]) * (Configuration::the().motors()->left_inverted ? -1 : 1));
-                } catch (...) {
-                    return { ResponseAction::None, STATUS_ERR_MOTOR_FAIL };
-                }
-            } else if (tokens[1] == "RIGHT" || tokens[1] == "R") {
-                try {
-                    motor_right->SetSpeed(stoi(tokens[2]) * (Configuration::the().motors()->right_inverted ? -1 : 1));
-                } catch (...) {
-                    return { ResponseAction::None, STATUS_ERR_MOTOR_FAIL };
-                }
-            } else {
-                return { ResponseAction::None, STATUS_ERR_INVALID_OPTIONS };
-            }
-
-            return { ResponseAction::None, STATUS_ACK };
-        } else if (Configuration::the().gui_present() && (tokens[0] == "FACE" || tokens[0] == "F")) {
-            if (tokens.size() < 2)
-                return { ResponseAction::None, STATUS_ERR_INVALID_OPTIONS };
-            
-            try {
-                int face = stoi(tokens[1]);
-                if (face < 0)
-                    return { ResponseAction::None, STATUS_ERR_INVALID_OPTIONS };
-                Messaging::SendMessage("face " + tokens[1]);
-            } catch (...) {
-                return { ResponseAction::None, STATUS_ERR_INVALID_OPTIONS };
-            }
-        } else {
-            return { ResponseAction::None, STATUS_ERR_UNKNOWN_COMMAND };
+      if (tokens[1] == "LEFT" || tokens[1] == "L") {
+        try {
+          motor_left->SetSpeed(stoi(tokens[2]) * (Configuration::the().motors()->left_inverted ? -1 : 1));
+        } catch (...) {
+          return { ResponseAction::None, STATUS_ERR_MOTOR_FAIL };
         }
-    }
+      } else if (tokens[1] == "RIGHT" || tokens[1] == "R") {
+        try {
+          motor_right->SetSpeed(stoi(tokens[2]) * (Configuration::the().motors()->right_inverted ? -1 : 1));
+        } catch (...) {
+          return { ResponseAction::None, STATUS_ERR_MOTOR_FAIL };
+        }
+      } else {
+        return { ResponseAction::None, STATUS_ERR_INVALID_OPTIONS };
+      }
 
-    return {
-        ResponseAction::None,
-        STATUS_ACK
-    };
+      return { ResponseAction::None, STATUS_ACK };
+    } else if (tokens[0] == "SERVO" || tokens[0] == "S") {
+      if (tokens.size() < 3)
+        return { ResponseAction::None, STATUS_ERR_INVALID_OPTIONS };
+
+      // SERVO <channel num> <angle>
+
+      uint channel = 0;
+      int angle = 0;
+
+      try {
+        channel = stoi(tokens[1]);
+        angle = stoi(tokens[2]);
+      } catch (...) {
+        return { ResponseAction::None, STATUS_ERR_INVALID_OPTIONS };
+      }
+
+      if (channel < 1 || channel > 8)
+        return { ResponseAction::None, STATUS_ERR_INVALID_OPTIONS };
+
+      if (angle < 0 || angle > 180)
+        return { ResponseAction::None, STATUS_ERR_INVALID_OPTIONS };
+
+      try {
+        servo_controller->setPin(channel, angle * 4096);
+      } catch (...) {
+        return { ResponseAction::None, STATUS_ERR_MOTOR_FAIL };
+      }
+    } else if (Configuration::the().gui_present() && (tokens[0] == "FACE" || tokens[0] == "F")) {
+      if (tokens.size() < 2)
+        return { ResponseAction::None, STATUS_ERR_INVALID_OPTIONS };
+
+      try {
+        int face = stoi(tokens[1]);
+        if (face < 0)
+          return { ResponseAction::None, STATUS_ERR_INVALID_OPTIONS };
+        Messaging::SendMessage("face " + tokens[1]);
+      } catch (...) {
+        return { ResponseAction::None, STATUS_ERR_INVALID_OPTIONS };
+      }
+    } else {
+      return { ResponseAction::None, STATUS_ERR_UNKNOWN_COMMAND };
+    }
+  }
+
+  return {
+    ResponseAction::None,
+    STATUS_ACK
+  };
 }
 
 }

@@ -3,7 +3,14 @@
 #include <Common.h>
 #include <Servers/Server.h>
 
+#include <Drivers/MotorDriver.h>
+#include <Drivers/PWMServo.h>
+
 namespace Server {
+
+extern Driver::MotorDriver* motor_left;
+extern Driver::MotorDriver* motor_right;
+extern Driver::PWMServo* servo_controller;
 
 class Main : public Server {
 public:

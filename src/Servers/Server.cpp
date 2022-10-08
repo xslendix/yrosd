@@ -4,14 +4,16 @@
 
 namespace Server {
 
-void Server::Run()
+void
+Server::Run()
 {
-    m_running = true;
+  m_running = true;
 };
 
-void Server::Stop()
+void
+Server::Stop()
 {
-    m_running = false;
+  m_running = false;
 };
 
 }

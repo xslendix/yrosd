@@ -64,13 +64,13 @@ struct Wrtists {
 };
 
 struct FaceTracking {
-    bool enabled = false;
+  bool enabled = false;
 
-    int head_camera = 0;
-    int rotate_camera = 90;
+  int head_camera = 0;
+  int rotate_camera = 90;
 
-    int speed_x = 3;
-    int speed_y = 2;
+  int speed_x = 3;
+  int speed_y = 2;
 };
 
 struct Face {

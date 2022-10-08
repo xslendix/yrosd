@@ -4,7 +4,7 @@
 
 namespace Server {
 
-class Video : public Server {
+class Face : public Server {
 public:
     void Run();
 };
