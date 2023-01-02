@@ -151,10 +151,22 @@ Commands
         be used with great care.
     4. `ENABLE` - Enable the motor.
 
-- `SERVO` - TBD.
-- `GPIO` - TBD.
+- `SERVO <servo id> <angle>` - Servo request \[Aliases: `S`]
+
+    If the specified servo is not found, send `COMMAND_ERR_NOT_FOUND`.
+
+- `GPIO <pin> <action> [arguments...]` - GPIO request.
+
+    If the specified pin is invalid, send `COMMAND_ERR_NOT_FOUND`.
+
+    Actions:
+    1. `DIGITAL_WRITE|DW <1|0>` - Writes a digital value to the pin. It also
+       sets the pin mode to OUTPUT.
+    2. `ANALOGUE_WRITE|AW <0-255>` - Writes an analogue value to the pin. It
+       also sets the pin mode to OUTPUT.
+
 - `DRIVE <speed...>` - Drive command. \[Aliases: `D`]
-    
+
     Depending on the _drive mode_, it sets motor speeds for the right motors.
 
 - `VIDEO <true|false>` - Enable/disable video streaming.
