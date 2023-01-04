@@ -62,7 +62,7 @@ INITIALIZATION MODE
 4. Parse `/data/syssettings.toml`. If invalid, blink LED 1 time indefinitely.
 5. If `/data/usersettings.toml` exists:
      1. Parse user settings using tomlc99, if any error occurs, delete
-        `/data/usersettings.toml` and go to 4
+        `/data/usersettings.toml` and go to 5
    else:
      1. Enter SETUP MODE
      2. Write file and go to 4
@@ -246,18 +246,16 @@ WiFiNetworks=[
 Responses
 ---------
 
-Format: "R<code byte>\r\n"
+Format: `R<code byte>\r\n`
 
 <!-- LTeX: enabled=false -->
 ERROR SYMBOL          | VALUE | Message/Description
-================================================================================
+----------------------|-------|-------------------------------------------------
 SETUP_OK              |  0x00 | Data on the server has been processed correctly.
 SETUP_CLIENT_OK       |  0x01 | Data on the client has been processed correctly.
 SETUP_ERR_INVALID     |  0x02 | Invalid configuration provided.
-                      |       |
 AUTH_PASS_FAIL        |  0x10 | Authentication failed. Please try again.
 AUTH_PASS_OK          |  0x10 | Authentication succeeded.
-                      |       |
 COMMAND_OK            |  0x20 | Command executed successfully.
 COMMAND_ERR_UNK       |  0x21 | An unknown error occured.
 COMMAND_ERR_ARGC      |  0x22 | Not enough arguments.
