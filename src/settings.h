@@ -4,6 +4,7 @@
 
 #include "common.h"
 #include "types.h"
+#include "networking.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -27,11 +28,30 @@ typedef struct system_settings {
   struct {
     drive_mode_t mode;
     i32 motor_top_left, motor_top_right,
-        motor_right_left, motor_right_right;
+        motor_bottom_left, motor_bottom_right;
   } driving;
+
+  bool is_valid;
 } system_settings_t;
 
-system_settings_t load_system_settings(char *file);
+char const *find_system_settings_path(void);
+system_settings_t load_system_settings(char const *file);
+void print_system_settings(system_settings_t settings);
+
+typedef struct user_settings {
+  struct {
+    char *name;
+  } general;
+  struct {
+    wifi_network_list_t wifi_networks;
+  } conectivity;
+  
+  bool is_valid;
+} user_settings_t;
+
+char const *find_user_settings_path(void);
+user_settings_t load_user_settings(char const *file);
+void print_user_settings(user_settings_t settings);
 
 #if defined(__cplusplus)
 }

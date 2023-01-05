@@ -1,0 +1,15 @@
+[Hardware]
+Motors=[  # Pololu Dual G2 Motor Driver
+  { fault=5, pwm=12, enabled=22, direction=24 },
+  { fault=6, pwm=13, enabled=23, direction=25, inverted=true },
+]
+
+[VideoStreaming]
+Enabled = true
+CameraDevice="/dev/video0"
+
+[Driving]
+Mode="tank"
+MotorTopLeft=0
+MotorTopRight=1
+

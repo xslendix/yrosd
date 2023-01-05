@@ -5,14 +5,21 @@ project('yrosd', 'c', 'cpp', default_options : [
 
 cc = meson.get_compiler('c')
 
+add_global_arguments(['-Wall', '-Wno-unknown-pragmas'], language : ['c', 'cpp'])
+
+
 dependencies = [
   dependency('toml', fallback : ['tomlc99', 'tomlc99_static_dep']),
+  dependency('libnm'),
   ]
 
 sources = [
-  'src/sysutil.c',
+  'src/common.c',
   'src/logging.c',
   'src/main.c',
+  'src/pigpiod_if.c',
+  'src/settings.c',
+  'src/sysutil.c',
   ]
 
 executable('yrosd', sources, dependencies : dependencies)

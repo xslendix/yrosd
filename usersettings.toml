@@ -1,0 +1,9 @@
+[General]
+RobotName="my-robot"
+
+[Conectivity]
+WiFiNetworks=[
+  { ssid="MyEpicWiFiNetwork", password="secretpassword123" },
+  { ssid="MyOpenEpicWiFiNetwork" },
+]
+

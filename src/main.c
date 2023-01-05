@@ -3,6 +3,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "yrosd.h"
 #include "common.h"
 #include "logging.h"
 #include "sysutil.h"
@@ -10,12 +11,14 @@
 
 #include "pigpiod_if.h"
 
-system_settings_t system_settings;
+app_t app;
 
 void
 clean_quit(void)
 {
-  free_system_settings(system_settings);
+  /* TODO: Free the memory! */
+  //free_system_settings(system_settings);
+
   pigpio_stop();
 }
 
@@ -24,23 +27,37 @@ main(i32 argc, char **argv)
 {
   i32 i;
 
-  LOG_MSG(LOG_INFO, "REAL %d", 123);
+  atexit(clean_quit);
 
   /* FIXME: Make this work. */
   // if (proc_find("yrosd", argv[0]) == -1)
   //   LOG_MSG(LOG_FATAL, "Already running!");
+
+  LOG_MSG(LOG_INFO, "Starting NetworkManager.");
+  app.client = nm_client_new(nullptr, nullptr);
+  if (!app.client)
+    LOG_MSG(LOG_FATAL, "Cannot connect to NetworkManager!");
 
   for (i = 1; i < argc; i++)
     if (strcmp(argv[i], "-D") == 0)
       if (!fork())
         return EXIT_SUCCESS;
 
-  pigpio_start(NULL, NULL);
+  LOG_MSG(LOG_INFO, "Starting pigpio connection.");
+  pigpio_start(nullptr, nullptr);
 
-  system_settings = load_system_settings("/data/syssettings.toml");
-  
+  LOG_MSG(LOG_INFO, "Loading system configuration file.");
+  char const *syssettings_path = find_system_settings_path();
+  if (!syssettings_path)
+    LOG_MSG(LOG_FATAL, "Cannot find path of `syssettings.toml`!");
 
-  clean_quit();
+  app.system_settings = load_system_settings(syssettings_path);
+  print_system_settings(app.system_settings);
+
+  LOG_MSG(LOG_INFO, "Loading user configuration file.");
+  char const *user_settings_path = find_user_settings_path();
+  app.user_settings = load_user_settings(user_settings_path);
+  print_user_settings(app.user_settings);
 
   return EXIT_SUCCESS;
 }

@@ -1,19 +1,21 @@
 #include "logging.h"
 
+#include "common.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <time.h>
 
-logging_t *DEFAULT_LOGGER = NULL;
+logging_t *DEFAULT_LOGGER = nullptr;
 
 logging_t *
 init_logging()
 {
   logging_t *logger;
   logger = malloc(sizeof(logging_t));
-  logger->log_file = NULL;
-  logger->fp = NULL;
+  logger->log_file = nullptr;
+  logger->fp = nullptr;
   logger->current_level = LOG_DEBUG;
   return logger;
 }
@@ -23,10 +25,10 @@ get_log_level_name(log_level_t level)
 {
   switch (level)
   {
-  case LOG_FATAL:   return "Fatal";
-  case LOG_ERROR:   return "Error";
-  case LOG_WARNING: return "Warning";
-  case LOG_INFO:    return "Info";
+  case LOG_FATAL:   return "\e[31mFatal\e[0m";
+  case LOG_ERROR:   return "\e[35mError\e[0m";
+  case LOG_WARNING: return "\e[33mWarning\e[0m";
+  case LOG_INFO:    return "\e[36mInfo\e[0m";
   case LOG_DEBUG:   return "Debug";
   }
 
@@ -36,7 +38,7 @@ get_log_level_name(log_level_t level)
 void
 log_msg(logging_t *logger, log_level_t const level, char const *format, ...)
 {
-  time_t t = time(NULL);
+  time_t t = time(nullptr);
   struct tm tm = *localtime(&t);
   FILE *fp = logger->fp;
   va_list ap;
@@ -59,7 +61,7 @@ log_msg(logging_t *logger, log_level_t const level, char const *format, ...)
     LOG();
 
   if (level == LOG_FATAL)
-    abort();
+    exit(EXIT_FAILURE);
 }
 
 void
