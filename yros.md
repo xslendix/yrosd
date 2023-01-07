@@ -203,7 +203,6 @@ network by clients. It must contain the following:
 
 ```
 YROSDS<YROS version>
-<IP address of robot>:<port>
 ```
 
 This, however, must be sent only every 5 seconds. This is to not spam the
