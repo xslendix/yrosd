@@ -6,6 +6,6 @@ vendor/opencv*
 toolchain-rpi.cmake
 settings.sh
 .cache
-subprojects/*
+subprojects/*/*.o
 !subprojects/packagefiles
 !subprojects/*.wrap
