@@ -15,6 +15,7 @@ dependencies = [
 
 sources = [
   'src/common.c',
+  'src/networking.c',
   'src/logging.c',
   'src/main.c',
   'src/pigpiod_if.c',

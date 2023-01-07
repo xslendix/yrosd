@@ -20,6 +20,8 @@ typedef unsigned char u8;
 char *trim_string_fast(char *str);
 char *to_lower_string(char *str);
 
+u16 random_u16(u16 min, u16 max);
+
 #define BREAKABLE_SCOPE() for (char __scope = 0; __scope == 0; __scope++)
 
 #if defined(__cplusplus)

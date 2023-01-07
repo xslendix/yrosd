@@ -11,6 +11,7 @@ typedef enum log_level {
   LOG_WARNING,
   LOG_INFO,
   LOG_DEBUG,
+  LOG_FIXME,
 } log_level_t;
 
 typedef struct logging {

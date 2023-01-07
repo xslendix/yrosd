@@ -30,6 +30,7 @@ get_log_level_name(log_level_t level)
   case LOG_WARNING: return "\e[33mWarning\e[0m";
   case LOG_INFO:    return "\e[36mInfo\e[0m";
   case LOG_DEBUG:   return "Debug";
+  case LOG_FIXME:    return "Fixme";
   }
 
   return "UNKNOWN";

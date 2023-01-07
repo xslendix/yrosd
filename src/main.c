@@ -1,9 +1,11 @@
+#include "src/networking.h"
+#include "yrosd.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-#include "yrosd.h"
 #include "common.h"
 #include "logging.h"
 #include "sysutil.h"
@@ -46,6 +48,9 @@ main(i32 argc, char **argv)
   LOG_MSG(LOG_INFO, "Starting pigpio connection.");
   pigpio_start(nullptr, nullptr);
 
+  app.running_port = random_u16(8000, 10000);
+  app.version = "23.1";
+
   LOG_MSG(LOG_INFO, "Loading system configuration file.");
   char const *syssettings_path = find_system_settings_path();
   if (!syssettings_path)
@@ -57,7 +62,13 @@ main(i32 argc, char **argv)
   LOG_MSG(LOG_INFO, "Loading user configuration file.");
   char const *user_settings_path = find_user_settings_path();
   app.user_settings = load_user_settings(user_settings_path);
+  if (!app.user_settings.is_valid) {
+    LOG_MSG(LOG_FIXME, "Implement SETUP MODE.");
+    LOG_MSG(LOG_FATAL, "Cannot proceed further, invalid user configuration.");
+  }
   print_user_settings(app.user_settings);
+
+  start_broadcasting();
 
   return EXIT_SUCCESS;
 }

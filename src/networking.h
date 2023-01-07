@@ -4,6 +4,8 @@
 extern "C" {
 #endif
 
+#include "common.h"
+
 #include <stdbool.h>
 
 #include <NetworkManager.h>
@@ -18,8 +20,15 @@ typedef struct wifi_network_list {
   wifi_network_t *networks;
 } wifi_network_list_t;
 
-bool AddWiFiNetworkIfNotExist(NMClient *client, wifi_network_t network);
-bool RescanWiFiNetworks(NMClient *client);
+typedef struct ipv4_addr {
+  u8 a, b, c, d;
+} ipv4_addr_t;
+
+bool add_wifi_network_if_not_exist(NMClient *client, wifi_network_t network);
+bool rescan_wifi_networks(NMClient *client);
+
+void start_broadcasting(void);
+void stop_broadcasting(void);
 
 #if defined(__cplusplus)
 }

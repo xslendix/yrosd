@@ -2,6 +2,8 @@
 
 #include <string.h>
 #include <ctype.h>
+#include <time.h>
+#include <stdlib.h>
 
 char *
 trim_string_fast(char *str)
@@ -46,3 +48,9 @@ to_lower_string(char *str)
   return ret;
 }
 
+u16
+random_u16(u16 min, u16 max)
+{
+  srand(time(nullptr));
+  return (rand() % (max - min + 1)) + min;
+}

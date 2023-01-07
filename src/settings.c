@@ -266,12 +266,12 @@ load_user_settings(char const *file)
   {
     toml_table_t *general_cat = toml_table_in(conf, "General");
     if (!general_cat)
-      throw_error();
+      return user;
 
     toml_datum_t robot_name = toml_string_in(general_cat, "RobotName");
     if (!robot_name.ok) {
       err = "General.RobotName not set.";
-      throw_error();
+      return user;
     }
 
     user.general.name = robot_name.u.s;
@@ -281,16 +281,16 @@ load_user_settings(char const *file)
   {
     toml_table_t *conectivity_cat = toml_table_in(conf, "Conectivity");
     if (!conectivity_cat)
-      throw_error();
+      return user;
 
     toml_array_t *wifi_networks = toml_array_in(conectivity_cat, "WiFiNetworks");
     if (!wifi_networks)
-      throw_error();
+      return user;
 
     user.conectivity.wifi_networks.cnt = toml_array_nelem(wifi_networks);
     user.conectivity.wifi_networks.networks = calloc(1, sizeof(wifi_network_t) * user.conectivity.wifi_networks.cnt);
     if (!user.conectivity.wifi_networks.networks)
-      throw_error();
+      return user;
 
     for (i32 i = 0; i < user.conectivity.wifi_networks.cnt; i++) {
       wifi_network_t *current = &user.conectivity.wifi_networks.networks[i];
@@ -298,7 +298,7 @@ load_user_settings(char const *file)
       toml_datum_t ssid = toml_string_in(network, "ssid");
       if (!ssid.ok) {
         err = "Conectivity.WiFiNetworks.*.ssid not set.";
-        throw_error();
+        return user;
       }
       current->ssid = ssid.u.s;
 
