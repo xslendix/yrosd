@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TYPES_H
+#define TYPES_H
 
 #include <stdbool.h>
 
@@ -22,3 +23,4 @@ typedef struct motor_list {
 }
 #endif
 
+#endif // TYPES_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SETTINGS_H
+#define SETTINGS_H
 
 #include <stdbool.h>
 
@@ -57,3 +58,4 @@ void print_user_settings(user_settings_t settings);
 }
 #endif
 
+#endif // SETTINGS_H

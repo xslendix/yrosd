@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NETWORKING_H
+#define NETWORKING_H
 
 #if defined(__cplusplus)
 extern "C" {
@@ -34,3 +35,4 @@ void stop_broadcasting(void);
 }
 #endif
 
+#endif // NETWORKING_H

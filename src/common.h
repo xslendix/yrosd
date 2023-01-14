@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COMMON_H
+#define COMMON_H
 
 #if defined(__cplusplus)
 extern "C" {
@@ -27,4 +28,6 @@ u16 random_u16(u16 min, u16 max);
 #if defined(__cplusplus)
 }
 #endif
+
+#endif // COMMON_H
 

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LOGGING_H
+#define LOGGING_H
 
 #include <stdio.h>
 #if defined(__cplusplus)
@@ -31,3 +32,4 @@ void free_logging(logging_t *logger);
 }
 #endif
 
+#endif // LOGGING_H

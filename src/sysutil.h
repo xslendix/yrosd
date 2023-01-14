@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SYSUTIL_H
+#define SYSUTIL_H
 
 #include <stdbool.h>
 #include <sys/types.h>
@@ -15,3 +16,4 @@ bool file_exists(char const *path);
 }
 #endif
 
+#endif // SYSUTIL_H

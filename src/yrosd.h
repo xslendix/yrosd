@@ -1,4 +1,5 @@
-#pragma once
+#ifndef YROSD_H
+#define YROSD_H
 
 #if defined(__cplusplus)
 extern "C" {
@@ -24,3 +25,4 @@ extern app_t app;
 }
 #endif
 
+#endif // YROSD_H
