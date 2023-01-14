@@ -10,6 +10,7 @@
 #include "logging.h"
 #include "sysutil.h"
 #include "settings.h"
+#include "server.h"
 
 #include "pigpiod_if.h"
 
@@ -68,7 +69,10 @@ main(i32 argc, char **argv)
   }
   print_user_settings(app.user_settings);
 
-  start_broadcasting();
+  pthread_t *thread = start_broadcasting();
+  pthread_t *thread_auth = start_main_server();
+  pthread_join(*thread, nullptr);
+  pthread_join(*thread_auth, nullptr);
 
   return EXIT_SUCCESS;
 }

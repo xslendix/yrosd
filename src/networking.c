@@ -1,5 +1,7 @@
 #include "networking.h"
 
+#include <bits/pthreadtypes.h>
+#include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -8,7 +10,7 @@
 #include "yrosd.h"
 #include "common.h"
 
-bool broadcasting_enabled = false;
+pthread_t thread;
 
 static void
 broadcast(char const *mess, u16 port)
@@ -38,27 +40,33 @@ broadcast(char const *mess, u16 port)
       LOG_MSG(LOG_FATAL, "sendto: %s", strerror(errno));
 }
 
+
 char *bmessage = nullptr;
 
-void
+void *
+broadcast_loop(void *data)
+{
+  (void) data;
+
+  for (;;) {
+    pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, nullptr);
+    broadcast(bmessage, app.running_port);
+    pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, nullptr);
+    sleep(5);
+  }
+}
+
+pthread_t *
 start_broadcasting(void)
 {
-  broadcasting_enabled = true;
   bmessage = malloc(sizeof(char) * 50);
   if (!bmessage)
     LOG_MSG(LOG_FATAL, "Cannot allocate memory for broadcast message!");
 
   snprintf(bmessage, 50, "YROSDS%s\n%hhd.%hhd.%hhd.%hhd:%hd", app.version, app.running_ip.a, app.running_ip.b, app.running_ip.c, app.running_ip.d, app.running_port);
 
-  if (!fork()) {
-    for (;;) {
-      if (!broadcasting_enabled)
-        break;
-
-      broadcast(bmessage, app.running_port);
-      sleep(5);
-    }
-  }
+  pthread_create(&thread, nullptr, &broadcast_loop, nullptr);
+  return &thread;
 }
 
 void
@@ -68,5 +76,5 @@ stop_broadcasting(void)
     free(bmessage);
   bmessage = nullptr;
 
-  broadcasting_enabled = false;
+  pthread_cancel(thread);
 }

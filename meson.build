@@ -17,6 +17,7 @@ sources = [
   'src/common.c',
   'src/networking.c',
   'src/logging.c',
+  'src/server.c',
   'src/main.c',
   'src/pigpiod_if.c',
   'src/settings.c',
