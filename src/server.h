@@ -17,16 +17,6 @@ typedef enum c_mode {
   MODE_COMMAND,
 } c_mode_t;
 
-char const *c_mode_name(c_mode_t mode) {
-  switch (mode) {
-    case MODE_AUTH:    return "Auth";
-    case MODE_SETUP:   return "Setup";
-    case MODE_COMMAND: return "Command";
-  }
-
-  return "(Unknown)";
-}
-
 #if defined(__cplusplus)
 }
 #endif

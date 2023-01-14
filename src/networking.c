@@ -10,7 +10,7 @@
 #include "yrosd.h"
 #include "common.h"
 
-pthread_t thread;
+pthread_t thread_broadcasting;
 
 static void
 broadcast(char const *mess, u16 port)
@@ -65,8 +65,8 @@ start_broadcasting(void)
 
   snprintf(bmessage, 50, "YROSDS%s\n%hhd.%hhd.%hhd.%hhd:%hd", app.version, app.running_ip.a, app.running_ip.b, app.running_ip.c, app.running_ip.d, app.running_port);
 
-  pthread_create(&thread, nullptr, &broadcast_loop, nullptr);
-  return &thread;
+  pthread_create(&thread_broadcasting, nullptr, &broadcast_loop, nullptr);
+  return &thread_broadcasting;
 }
 
 void
@@ -76,5 +76,5 @@ stop_broadcasting(void)
     free(bmessage);
   bmessage = nullptr;
 
-  pthread_cancel(thread);
+  pthread_cancel(thread_broadcasting);
 }

@@ -10,7 +10,7 @@
 
 #include <pthread.h>
 
-pthread_t thread;
+pthread_t thread_main;
 
 typedef struct client_data {
   c_mode_t mode;
@@ -139,6 +139,6 @@ main_server_loop(void *data)
 pthread_t *
 start_main_server(void)
 {
-  pthread_create(&thread, nullptr, &main_server_loop, nullptr);
-  return &thread;
+  pthread_create(&thread_main, nullptr, &main_server_loop, nullptr);
+  return &thread_main;
 }
