@@ -208,6 +208,8 @@ YROSDS<YROS version>
 This, however, must be sent only every 5 seconds. This is to not spam the
 network too much.
 
+It must be sent on port 9901.
+
 `syssettings.toml`
 -------------------
 
