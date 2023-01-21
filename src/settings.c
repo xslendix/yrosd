@@ -212,6 +212,19 @@ print_system_settings(system_settings_t settings)
     LOG_MSG(LOG_DEBUG, "  MotorBottomRight: %d", settings.driving.motor_bottom_right);
 }
 
+char const *
+drive_mode_str(drive_mode_t mode) {
+  switch (mode) {
+    case SINGLE: return "single";
+    case TANK: return "tank";
+    case QUADTANK: return "quadtank";
+    case MECANUM: return "mecanum";
+  }
+
+  return "(null)";
+}
+
+
 #pragma endregion
 
 #pragma region User Settings

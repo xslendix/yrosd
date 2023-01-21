@@ -1,5 +1,7 @@
 #include "common.h"
 
+#include <stdarg.h>
+#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
@@ -8,29 +10,20 @@
 char *
 trim_string_fast(char *str)
 {
-  /* This function trims a given string without allocating new memory.
-   * However, it does set a \0 at the end and advances the pointer accordingly.*/
-  int i, len;
+  char *end;
 
   if (*str == '\0')
     return str;
 
-  for (;;) {
-    if (*str == '\0')
-      return str;
+  while(isspace((unsigned char)*str)) str++;
 
-    if (!isblank(*str))
-      break;
+  if(*str == 0)
+    return str;
 
-    str++;
-  }
+  end = str + strlen(str) - 1;
+  while(end > str && isspace((unsigned char)*end)) end--;
 
-  len = strlen(str);
-  for (i = len; i > 0; i--)
-    if (!isblank(str[i - 1]))
-      break;
-
-  str[i] = '\0';
+  end[1] = '\0';
 
   return str;
 }
@@ -38,6 +31,9 @@ trim_string_fast(char *str)
 char *
 to_lower_string(char *str)
 {
+  if (str == nullptr)
+    return nullptr;
+
   char *ret = str;
 
   while (*str) {
@@ -46,6 +42,19 @@ to_lower_string(char *str)
   }
 
   return ret;
+}
+
+char format_buf[1024];
+
+char const *
+text_format(char *format, ...)
+{
+  va_list lst;
+  va_start(lst, format);
+  vsnprintf(format_buf, sizeof(format_buf), format, lst);
+  va_end(lst);
+
+  return format_buf;
 }
 
 u16

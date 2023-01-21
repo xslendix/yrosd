@@ -39,6 +39,8 @@ char const *find_system_settings_path(void);
 system_settings_t load_system_settings(char const *file);
 void print_system_settings(system_settings_t settings);
 
+char const *drive_mode_str(drive_mode_t mode);
+
 typedef struct user_settings {
   struct {
     char *name;

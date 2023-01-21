@@ -119,6 +119,13 @@ invalid.
 Commands
 --------
 
+- `INFO` - Request information
+
+    This command reports what features are enabled for the robot, as well as
+    some other information such as network information.
+
+    View the INFORMATION for the response data.
+
 - `UCONF <category> <key> <value>` - Update configuration
 
     This commands looks for any configuration key-value pair in the specified
@@ -210,6 +217,19 @@ network too much.
 
 It must be sent on port 9901.
 
+INFORMATION
+-----------
+
+TOML format, may be extended.
+```toml
+Features=[
+  'VideoStreaming',  # Video streaming available
+]
+Network='MyCoolSSID' # Available if connected.
+RobotName='my-robot'
+DrivingMode='tank'
+```
+
 `syssettings.toml`
 -------------------
 
@@ -256,7 +276,7 @@ SETUP_OK              |  0x00 | Data on the server has been processed correctly.
 SETUP_CLIENT_OK       |  0x01 | Data on the client has been processed correctly.
 SETUP_ERR_INVALID     |  0x02 | Invalid configuration provided.
 AUTH_PASS_FAIL        |  0x10 | Authentication failed. Please try again.
-AUTH_PASS_OK          |  0x10 | Authentication succeeded.
+AUTH_PASS_OK          |  0x11 | Authentication succeeded.
 COMMAND_OK            |  0x20 | Command executed successfully.
 COMMAND_ERR_UNK       |  0x21 | An unknown error occured.
 COMMAND_ERR_ARGC      |  0x22 | Not enough arguments.

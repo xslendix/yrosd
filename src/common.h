@@ -20,6 +20,7 @@ typedef unsigned char u8;
 
 char *trim_string_fast(char *str);
 char *to_lower_string(char *str);
+char const *text_format(char *format, ...);
 
 u16 random_u16(u16 min, u16 max);
 
