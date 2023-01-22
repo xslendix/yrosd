@@ -1,6 +1,7 @@
 #ifndef YROSD_H
 #define YROSD_H
 
+#include "src/motor_controller.h"
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -17,6 +18,8 @@ typedef struct app {
   u16 running_port;
   ipv4_addr_t running_ip;
   char const *version;
+  i32 pi;
+  motor_controller_t motor_controller;
 } app_t;
 
 extern app_t app;

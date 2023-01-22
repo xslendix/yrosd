@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef long long i64;
 typedef unsigned long long u64;
@@ -23,6 +24,10 @@ char *to_lower_string(char *str);
 char const *text_format(char *format, ...);
 
 u16 random_u16(u16 min, u16 max);
+bool is_str_alphanumeric(char *str);
+
+#define IS_OK(a) (a >= 0)
+#define IS_FAIL(a) (a < 0)
 
 #define BREAKABLE_SCOPE() for (char __scope = 0; __scope == 0; __scope++)
 

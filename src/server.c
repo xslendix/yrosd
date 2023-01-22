@@ -11,7 +11,10 @@
 #include <arpa/inet.h>
 #include <sys/select.h>
 #include <sys/socket.h>
+#include <ctype.h>
 
+#include "pigpiod_if2.h"
+ 
 #include <pthread.h>
 
 pthread_t thread_main;
@@ -48,11 +51,11 @@ execute_auth(int i, char *msg, int sock, client_data_t *data, int argc, char *ar
 {
   int ret;
   if (strcmp(msg, PASSWORD) == 0) {
-    LOG_MSG(LOG_INFO, "New client logged in successfully!");
+    LOG_MSG(LOG_INFO, "Main server: New client logged in successfully!");
     SEND_MSG(sock, AUTH_PASS_OK);
     data->mode = MODE_COMMAND;
   } else {
-    LOG_MSG(LOG_INFO, "New client failed to log in! Either a bad configuration on client side or a possible attack.");
+    LOG_MSG(LOG_INFO, "Main server: New client failed to log in! Either a bad configuration on client side or a possible attack.");
     SEND_MSG(sock, AUTH_PASS_FAIL);
   }
 }
@@ -60,6 +63,18 @@ execute_auth(int i, char *msg, int sock, client_data_t *data, int argc, char *ar
 void
 execute_setup(int i, char *msg, int sock, client_data_t *data, int argc, char *argv[])
 { }
+
+typedef enum gpio_action {
+  ACTION_ANALOGUE_WRITE,
+  ACTION_DIGITAL_WRITE,
+} gpio_action_t;
+
+typedef enum motor_action {
+  ACTION_MOTOR_SET,
+  ACTION_MOTOR_STOP,
+  ACTION_MOTOR_DISABLE,
+  ACTION_MOTOR_ENABLE,
+} motor_action_t;
 
 void
 execute_command(int i, char *msg, int sock, client_data_t *data, int argc, char *argv[])
@@ -70,6 +85,8 @@ execute_command(int i, char *msg, int sock, client_data_t *data, int argc, char 
     send(sock, COMMAND_ERR_ARGC, strlen(COMMAND_ERR_ARGC), 0);
     return;
   }
+
+  errno = 0;
 
   to_lower_string(argv[0]);
   LOG_MSG(LOG_DEBUG, "Command: `%s` by socket %d", argv[0], sock);
@@ -85,6 +102,152 @@ execute_command(int i, char *msg, int sock, client_data_t *data, int argc, char 
                                "RobotName='%s'\r\n"
                                "DrivingMode='%s'\r\n%s",
                        features, app.user_settings.general.name, drive_mode_str(app.system_settings.driving.mode), COMMAND_OK));
+  } else if (!strcmp(argv[0], "gpio")) {
+    if (argc < 3) {
+      LOG_MSG(LOG_DEBUG, "Main server: GPIO: Not enough arguments provided.");
+      SEND_MSG(sock, COMMAND_ERR_ARGC);
+      return;
+    }
+
+    int pin = strtol(argv[1], NULL, 0);
+    if (errno == EINVAL || errno == ERANGE) {
+      LOG_MSG(LOG_ERROR, "Main server: GPIO: Invalid GPIO pin specified.");
+      SEND_MSG(sock, COMMAND_ERR_INV_ARG);
+      return;
+    }
+
+    char *action_str = to_lower_string(argv[2]);
+    gpio_action_t action;
+    if (!strcmp(action_str, "analogue_write") || !strcmp(action_str, "aw"))
+      action = ACTION_ANALOGUE_WRITE;
+    else if (!strcmp(action_str, "digital_write") || !strcmp(action_str, "dw"))
+      action = ACTION_DIGITAL_WRITE;
+    else {
+      LOG_MSG(LOG_ERROR, "Main server: GPIO: Invalid GPIO action specified.");
+      SEND_MSG(sock, COMMAND_ERR_INV_ARG);
+      return;
+    }
+
+    argv += 3;
+    argc -= 3;
+    switch (action) {
+      case ACTION_ANALOGUE_WRITE: {
+          SEND_MSG(sock, COMMAND_ERR_CFG);
+          return;
+
+          if (argc < 1) {
+            LOG_MSG(LOG_ERROR, "Main server: GPIO: No GPIO value specified.");
+            SEND_MSG(sock, COMMAND_ERR_INV_ARG);
+            return;
+          }
+
+          i32 value = strtol(argv[0], NULL, 0);
+          if (errno == EINVAL || errno == ERANGE) {
+            LOG_MSG(LOG_ERROR, "Main server: GPIO: GPIO value specified is not a number.");
+            SEND_MSG(sock, COMMAND_ERR_INV_ARG);
+            return;
+          }
+
+          value = CLAMP(value, 0, 255);
+
+          // FIXME: Implement.
+      }
+      case ACTION_DIGITAL_WRITE: {
+          if (argc < 1) {
+            LOG_MSG(LOG_ERROR, "Main server: GPIO: No GPIO value specified.");
+            SEND_MSG(sock, COMMAND_ERR_INV_ARG);
+          }
+
+          int value = strtol(argv[0], NULL, 0);
+          if (errno == EINVAL || errno == ERANGE) {
+            LOG_MSG(LOG_ERROR, "Main server: GPIO: GPIO value specified is not a number.");
+            SEND_MSG(sock, COMMAND_ERR_INV_ARG);
+            return;
+          }
+
+          value = CLAMP(value, 0, 1);
+
+          gpio_write(app.pi, pin, value);
+      }
+      break;
+    }
+  } else if (!strcmp(argv[0], "motor") || !strcmp(argv[0], "m")) {
+    if (argc < 3) {
+      LOG_MSG(LOG_DEBUG, "Main server: MOTOR: Not enough arguments provided.");
+      SEND_MSG(sock, COMMAND_ERR_ARGC);
+      return;
+    }
+
+    int motor_id = strtol(argv[1], NULL, 0);
+    if (errno == EINVAL || errno == ERANGE || motor_id >= app.system_settings.hardware.motors.cnt) {
+      LOG_MSG(LOG_ERROR, "Main server: MOTOR: Invalid motor ID specified.");
+      SEND_MSG(sock, COMMAND_ERR_INV_ARG);
+      return;
+    }
+
+    char *action_str = to_lower_string(argv[2]);
+    motor_action_t action;
+    if (!strcmp(action_str, "set") || !strcmp(action_str, "s"))
+      action = ACTION_MOTOR_SET;
+    else if (!strcmp(action_str, "stop") || !strcmp(action_str, "t"))
+      action = ACTION_MOTOR_STOP;
+    else if (!strcmp(action_str, "disable"))
+      action = ACTION_MOTOR_DISABLE;
+    else if (!strcmp(action_str, "enable"))
+      action = ACTION_MOTOR_ENABLE;
+    else {
+      LOG_MSG(LOG_ERROR, "Main server: MOTOR: Invalid MOTOR action specified.");
+      SEND_MSG(sock, COMMAND_ERR_INV_ARG);
+      return;
+    }
+
+    argc -= 3;
+    argv += 3;
+    switch (action) {
+      case ACTION_MOTOR_SET: {
+        if (argc < 1) {
+          LOG_MSG(LOG_ERROR, "Main server: MOTOR: Not enough arguments provided (SET).");
+          SEND_MSG(sock, COMMAND_ERR_INV_ARG);
+          return;
+        }
+
+        char *err;
+        double speed = strtod(argv[0], &err);
+        if (errno == ERANGE || err == argv[0]) {
+          LOG_MSG(LOG_ERROR, "Main server: MOTOR: Invalid motor speed.");
+          SEND_MSG(sock, COMMAND_ERR_INV_ARG);
+          return;
+        }
+
+        speed = CLAMP(speed, -1, 1);
+        if (IS_OK(motor_controller_set_speed(&app.motor_controller, &app.system_settings.hardware.motors.motors[motor_id], speed))) {
+          LOG_MSG(LOG_ERROR, "Main server: MOTOR: Set motor speed successfully.");
+          SEND_MSG(sock, COMMAND_OK);
+          return;
+        } else {
+          LOG_MSG(LOG_ERROR, "Main server: MOTOR: Cannot set motor speed.");
+          SEND_MSG(sock, COMMAND_ERR_UNK);
+          return;
+        }
+      } break;
+      case ACTION_MOTOR_STOP: {
+        if (IS_OK(motor_controller_set_speed(&app.motor_controller, &app.system_settings.hardware.motors.motors[motor_id], 0))) {
+          LOG_MSG(LOG_ERROR, "Main server: MOTOR: Set motor speed successfully.");
+          SEND_MSG(sock, COMMAND_OK);
+          return;
+        } else {
+          LOG_MSG(LOG_ERROR, "Main server: MOTOR: Cannot set motor speed.");
+          SEND_MSG(sock, COMMAND_ERR_UNK);
+          return;
+        }
+      } break;
+      case ACTION_MOTOR_DISABLE: {
+        app.system_settings.hardware.motors.motors[motor_id].enabled = false;
+      } break;
+      case ACTION_MOTOR_ENABLE: {
+        app.system_settings.hardware.motors.motors[motor_id].enabled = true;
+      } break;
+    }
   } else {
     SEND_MSG(sock, COMMAND_ERR_UNK);
   }
@@ -97,7 +260,11 @@ parse_message(int i, char *msg, client_data_t *data, int sock)
     LOG_MSG(LOG_ERROR, "parse_message: `msg` is NULL! Ignoring message.");
     return;
   }
+
   trim_string_fast(msg);
+  if (!is_str_alphanumeric(msg)) {
+    return;
+  }
 
   char const *delim = " \t";
 

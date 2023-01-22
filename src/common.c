@@ -21,7 +21,7 @@ trim_string_fast(char *str)
     return str;
 
   end = str + strlen(str) - 1;
-  while(end > str && isspace((unsigned char)*end)) end--;
+  while(end > str && (isspace(*end) || isblank(*end))) end--;
 
   end[1] = '\0';
 
@@ -63,3 +63,15 @@ random_u16(u16 min, u16 max)
   srand(time(nullptr));
   return (rand() % (max - min + 1)) + min;
 }
+
+bool
+is_str_alphanumeric(char *str)
+{
+  while (*str) {
+    if (*str > 127 || *str < 0)
+      return false;
+    str++;
+  }
+  return true;
+}
+

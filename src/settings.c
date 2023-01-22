@@ -94,19 +94,20 @@ load_system_settings(char const *file)
     for (i32 i = 0; i < sys.hardware.motors.cnt; i++) {
       toml_table_t *motor = toml_table_at(motors_arr, i);
       toml_datum_t fault = toml_int_in(motor, "fault");
-      sys.hardware.motors.motors[i].fault = fault.ok ? fault.u.i : 0;
+      sys.hardware.motors.motors[i].pins.fault = fault.ok ? fault.u.i : 0;
       toml_datum_t pwm = toml_int_in(motor, "pwm");
       if (!pwm.ok)
         throw_error();
-      sys.hardware.motors.motors[i].pwm = pwm.u.i;
+      sys.hardware.motors.motors[i].pins.pwm = pwm.u.i;
       toml_datum_t enabled = toml_int_in(motor, "enabled");
-      sys.hardware.motors.motors[i].enabled = enabled.ok ? enabled.u.i : 0;
+      sys.hardware.motors.motors[i].pins.enabled = enabled.ok ? enabled.u.i : 0;
       toml_datum_t direction = toml_int_in(motor, "direction");
       if (!direction.ok)
         throw_error();
-      sys.hardware.motors.motors[i].direction = direction.u.i;
+      sys.hardware.motors.motors[i].pins.direction = direction.u.i;
       toml_datum_t inverted = toml_bool_in(motor, "inverted");
       sys.hardware.motors.motors[i].inverted = inverted.ok ? inverted.u.b : false;
+      sys.hardware.motors.motors[i].enabled = false;
     }
   }
 
@@ -192,7 +193,7 @@ print_system_settings(system_settings_t settings)
   LOG_MSG(LOG_DEBUG, "  Motors:")
   for (i = 0; i < settings.hardware.motors.cnt; i++) {
     motor_t *motor = &settings.hardware.motors.motors[i];
-    LOG_MSG(LOG_DEBUG, "    - fault=%d pwm=%d enabled=%d dir=%d inv=%d", motor->fault, motor->pwm, motor->enabled, motor->direction, motor->inverted);
+    LOG_MSG(LOG_DEBUG, "    - fault=%d pwm=%d enabled=%d dir=%d inv=%d", motor->pins.fault, motor->pins.pwm, motor->pins.enabled, motor->pins.direction, motor->inverted);
   }
 
   LOG_MSG(LOG_DEBUG, "VIDEO STREAMING:")

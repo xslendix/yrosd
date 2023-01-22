@@ -7,7 +7,6 @@ cc = meson.get_compiler('c')
 
 add_global_arguments(['-Wall', '-Wno-unknown-pragmas'], language : ['c', 'cpp'])
 
-
 dependencies = [
   dependency('toml', fallback : ['tomlc99', 'tomlc99_static_dep']),
   dependency('libnm'),
@@ -15,14 +14,20 @@ dependencies = [
 
 sources = [
   'src/common.c',
+  'src/motor_controller.c',
   'src/networking.c',
   'src/logging.c',
   'src/server.c',
   'src/main.c',
-  'src/pigpiod_if.c',
   'src/settings.c',
   'src/sysutil.c',
   ]
+
+if get_option('debugpigpio').enabled()
+  sources += 'src/pigpiod_if2.c'
+else
+  dependencies += dependency('pigpio_if2')
+endif
 
 executable('yrosd', sources, dependencies : dependencies)
 

@@ -1,3 +1,4 @@
+#include "src/motor_controller.h"
 #include "src/networking.h"
 #include "yrosd.h"
 
@@ -12,7 +13,7 @@
 #include "settings.h"
 #include "server.h"
 
-#include "pigpiod_if.h"
+#include "pigpiod_if2.h"
 
 app_t app;
 
@@ -22,7 +23,7 @@ clean_quit(void)
   /* TODO: Free the memory! */
   //free_system_settings(system_settings);
 
-  pigpio_stop();
+  pigpio_stop(app.pi);
 }
 
 i32
@@ -47,7 +48,11 @@ main(i32 argc, char **argv)
         return EXIT_SUCCESS;
 
   LOG_MSG(LOG_INFO, "Starting pigpio connection.");
-  pigpio_start(nullptr, nullptr);
+  if ((app.pi = pigpio_start(nullptr, nullptr)) < 0)
+    LOG_MSG(LOG_FATAL, "Cannot initialize pigpio connection.");
+
+  if (IS_FAIL(motor_controller_init(&app.motor_controller)))
+    LOG_MSG(LOG_FATAL, "Cannot motor controller.");
 
   app.running_port = random_u16(8000, 10000);
   app.version = "23.1";
