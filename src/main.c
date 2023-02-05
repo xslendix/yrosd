@@ -28,30 +28,34 @@ i32
 main(i32 argc, char **argv)
 {
   i32 i;
-
-  atexit(clean_quit);
-
   for (i = 1; i < argc; i++) {
-    if (!strcmp(argv[i], "-S") || !strcmp(argv[0], "--stop")) {
+    if (!strcmp(argv[i], "-D") || !strcmp(argv[i], "--daemonize")) {
+      puts("FORKING");
+      daemonize();
+      break;
+    } else if (!strcmp(argv[i], "-S") || !strcmp(argv[i], "--stop")) {
       pid_t proc = proc_find("yrosd");
+      if (proc < 0)
+        LOG_MSG(LOG_FATAL, "Cannot find daemon process.");
       kill(proc, SIGTERM);
       return EXIT_SUCCESS;
     }
-    if (!strcmp(argv[i], "-R") || !strcmp(argv[0], "--reload")) { // TODO: Implement.
+    else if (!strcmp(argv[i], "-R") || !strcmp(argv[i], "--reload")) {
       pid_t proc = proc_find("yrosd");
+      if (proc < 0)
+        LOG_MSG(LOG_FATAL, "Cannot find daemon process.");
       kill(proc, 1);
       return EXIT_SUCCESS;
     }
-    if (!strcmp(argv[i], "-V") || !strcmp(argv[0], "--version")) { // TODO: Implement.
+    else if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--version")) {
       printf("YROS Daemon version %s (Protocol %s).\n", VERSION, PROTOCOL_VERSION);
       return EXIT_SUCCESS;
+    } else {
+      LOG_MSG(LOG_FATAL, "Invalid argument: `%s`", argv[i]);
     }
-
-    if (strcmp(argv[i], "-D") == 0)
-      if (!fork())
-        return EXIT_SUCCESS;
   }
 
+  atexit(clean_quit);
 
   LOG_MSG(LOG_INFO, "Starting NetworkManager.");
   app.client = nm_client_new(nullptr, nullptr);
@@ -60,7 +64,7 @@ main(i32 argc, char **argv)
 
   LOG_MSG(LOG_INFO, "Starting pigpio connection.");
   if ((app.pi = pigpio_start(nullptr, nullptr)) < 0)
-    LOG_MSG(LOG_FATAL, "Cannot initialize pigpio connection.");
+    LOG_MSG(LOG_FATAL, "Cannot initialise pigpio connection.");
 
   if (IS_FAIL(motor_controller_init(&app.motor_controller)))
     LOG_MSG(LOG_FATAL, "Cannot motor controller.");
@@ -91,5 +95,30 @@ main(i32 argc, char **argv)
   pthread_join(*thread_auth, nullptr);
 
   return EXIT_SUCCESS;
+}
+
+void
+reload_signal_handler(int signum)
+{
+  (void)signum;
+  LOG_MSG(LOG_INFO, "Reloading system configuration file...");
+  char const *system_settings_path = find_system_settings_path();
+  if (!system_settings_path) {
+    LOG_MSG(LOG_ERROR, "Cannot find path of `syssettings.toml`!");
+    return;
+  }
+  system_settings_t system_settings = load_system_settings(system_settings_path);
+  if (!system_settings.is_valid) {
+    LOG_MSG(LOG_ERROR, "Invalid system configuration. Using previous configuration.");
+    return;
+  }
+  app.system_settings = system_settings;
+  LOG_MSG(LOG_INFO, "New configuration file loaded successfully!");
+}
+
+void
+initialise_signals(void)
+{
+  signal(1, reload_signal_handler);
 }
 

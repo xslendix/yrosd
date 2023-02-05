@@ -1,6 +1,7 @@
 #include "sysutil.h"
 
 #include "common.h"
+#include "yrosd.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +12,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define MAX_LEN (256)
+#define MAX_LEN (512)
 
 pid_t
 proc_find(char const *proc_name)
@@ -55,21 +56,22 @@ void
 daemonize()
 {
   pid_t pid;
-
-  /* Fork off the parent process */
+  
   pid = fork();
-
-  /* An error occurred */
   if (pid < 0)
     exit(EXIT_FAILURE);
-
-  /* Success: Let the parent terminate */
   if (pid > 0)
     exit(EXIT_SUCCESS);
-
-  /* On success: The child process becomes session leader */
   if (setsid() < 0)
     exit(EXIT_FAILURE);
+
+  initialise_signals();
+
+  pid = fork();
+  if (pid < 0)
+    exit(EXIT_FAILURE);
+  if (pid > 0)
+    exit(EXIT_SUCCESS);
 }
 
 bool file_exists(char const *path)

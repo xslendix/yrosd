@@ -63,10 +63,17 @@ load_system_settings(char const *file)
   sys.driving.motor_top_right = -1;
   sys.driving.motor_bottom_left = -1;
   sys.driving.motor_bottom_right = -1;
-#define throw_error() LOG_MSG(LOG_FATAL, "Cannot parse system configuration file: %s", err);
+#define throw_error() { \
+  LOG_MSG(LOG_ERROR, "Cannot parse system configuration file: %s", err); \
+  sys.is_valid = false; \
+  return sys; \
+}
 
-  if (!fp) 
-    LOG_MSG(LOG_FATAL, "Cannot open system configuration file `%s`: %s", file, strerror(errno));
+  if (!fp) {
+    LOG_MSG(LOG_ERROR, "Cannot open system configuration file `%s`: %s", file, strerror(errno));
+    sys.is_valid = false;
+    return sys;
+  }
 
   sys.is_valid = false;
 
