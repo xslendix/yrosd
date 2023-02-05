@@ -1,5 +1,3 @@
-#include "src/motor_controller.h"
-#include "src/networking.h"
 #include "yrosd.h"
 
 #include <stdio.h>
@@ -33,19 +31,32 @@ main(i32 argc, char **argv)
 
   atexit(clean_quit);
 
-  /* FIXME: Make this work. */
-  // if (proc_find("yrosd", argv[0]) == -1)
-  //   LOG_MSG(LOG_FATAL, "Already running!");
+  for (i = 1; i < argc; i++) {
+    if (!strcmp(argv[i], "-S") || !strcmp(argv[0], "--stop")) {
+      pid_t proc = proc_find("yrosd");
+      kill(proc, SIGTERM);
+      return EXIT_SUCCESS;
+    }
+    if (!strcmp(argv[i], "-R") || !strcmp(argv[0], "--reload")) { // TODO: Implement.
+      pid_t proc = proc_find("yrosd");
+      kill(proc, 1);
+      return EXIT_SUCCESS;
+    }
+    if (!strcmp(argv[i], "-V") || !strcmp(argv[0], "--version")) { // TODO: Implement.
+      printf("YROS Daemon version %s (Protocol %s).\n", VERSION, PROTOCOL_VERSION);
+      return EXIT_SUCCESS;
+    }
+
+    if (strcmp(argv[i], "-D") == 0)
+      if (!fork())
+        return EXIT_SUCCESS;
+  }
+
 
   LOG_MSG(LOG_INFO, "Starting NetworkManager.");
   app.client = nm_client_new(nullptr, nullptr);
   if (!app.client)
     LOG_MSG(LOG_FATAL, "Cannot connect to NetworkManager!");
-
-  for (i = 1; i < argc; i++)
-    if (strcmp(argv[i], "-D") == 0)
-      if (!fork())
-        return EXIT_SUCCESS;
 
   LOG_MSG(LOG_INFO, "Starting pigpio connection.");
   if ((app.pi = pigpio_start(nullptr, nullptr)) < 0)

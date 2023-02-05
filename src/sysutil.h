@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-pid_t proc_find(char const *name, char const *current);
+pid_t proc_find(char const *proc_name);
 void daemonize();
 bool file_exists(char const *path);
 

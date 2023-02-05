@@ -11,48 +11,44 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-/* https://stackoverflow.com/a/6898456 */
+#define MAX_LEN (256)
+
 pid_t
-proc_find(char const *name, char const *current)
+proc_find(char const *proc_name)
 {
-  DIR *dir;
-  struct dirent *ent;
-  char *endptr;
-  char buf[512];
+  int pid = -1;
+  char cmdPath[MAX_LEN];
+  char cmdLine[MAX_LEN];
+  char *pos;
+  FILE *cmdFile;
 
-  if (!(dir = opendir("/proc"))) {
-    perror("can't open /proc");
-    return -1;
-  }
-
-  while ((ent = readdir(dir)) != nullptr) {
-    /* if endptr is not a null character, the directory is not
-     * entirely numeric, so ignore it */
-    i64 lpid = strtol(ent->d_name, &endptr, 10);
-    if (*endptr != '\0') {
-      continue;
-    }
-
-    /* try to open the cmdline file */
-    snprintf(buf, sizeof(buf), "/proc/%lld/cmdline", lpid);
-    FILE *fp = fopen(buf, "r");
-
-    if (fp) {
-      if (fgets(buf, sizeof(buf), fp) != nullptr) {
-        /* check the first token in the file, the program name */
-        char *first = strtok(buf, " ");
-        if (!strcmp(first, name) || strcmp(first, current)) {
-          fclose(fp);
-          closedir(dir);
-          return (pid_t)lpid;
+  DIR *dp = opendir("/proc");
+  if (dp != NULL) {
+    struct dirent *dirp;
+    while (pid < 0 && (dirp = readdir(dp))) {
+      int id = atoi(dirp->d_name);
+      if (id > 0) {
+        sprintf(cmdPath, "/proc/%s/cmdline", dirp->d_name);
+        cmdFile = fopen(cmdPath, "r");
+        fgets(cmdLine, MAX_LEN, cmdFile);
+        fclose(cmdFile);
+        if (strlen(cmdLine) > 0) {
+          pos = strchr(cmdLine, '\0');
+          if (pos != NULL)
+            *pos = '\0';
+          pos = strrchr(cmdLine, '/');
+          if (pos != NULL)
+            strcpy(cmdLine, pos + 1);
+          if (strcmp(proc_name, cmdLine) == 0)
+            pid = id;
         }
       }
-      fclose(fp);
     }
   }
 
-  closedir(dir);
-  return -1;
+  closedir(dp);
+
+  return pid;
 }
 
 void

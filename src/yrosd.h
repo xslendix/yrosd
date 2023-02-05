@@ -6,6 +6,9 @@
 extern "C" {
 #endif
 
+#define VERSION "v0.1"
+#define PROTOCOL_VERSION "v1.0"
+
 #include "settings.h"
 #include "networking.h"
 
