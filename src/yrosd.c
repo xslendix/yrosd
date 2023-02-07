@@ -96,7 +96,7 @@ main(i32 argc, char **argv)
 }
 
 void
-reload_signal_handler(int signum)
+reload_signal_handler(i32 signum)
 {
   (void) signum;
   LOG_MSG(LOG_INFO, "Reloading system configuration file...");

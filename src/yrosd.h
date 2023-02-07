@@ -28,7 +28,7 @@ typedef struct app {
 extern app_t app;
 
 void initialise_signals(void);
-void reload_signal_handler(int signum);
+void reload_signal_handler(i32 signum);
 
 #if defined(__cplusplus)
 }

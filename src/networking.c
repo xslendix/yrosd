@@ -17,9 +17,9 @@ broadcast(char const *mess, u16 port)
 {
   struct sockaddr_in s;
 
-  int broadcast_socket = socket(AF_INET, SOCK_DGRAM, 0);
-  int so_broadcast     = 1;
-  int so_reuseaddr     = 1;
+  i32 broadcast_socket = socket(AF_INET, SOCK_DGRAM, 0);
+  i32 so_broadcast     = 1;
+  i32 so_reuseaddr     = 1;
 
   if (broadcast_socket < 0)
     LOG_MSG(LOG_FATAL, "Cannot open broadcast socket! %s", strerror(errno));

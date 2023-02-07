@@ -63,10 +63,10 @@ char const *COMMAND_ERR_CFG =
     (char[]) { 0x35, '\r', '\n', '\0' }; // Command not configured.
 
 void
-execute_auth(int i, char *msg, int sock, client_data_t *data, int argc,
+execute_auth(i32 i, char *msg, i32 sock, client_data_t *data, i32 argc,
              char *argv[])
 {
-  int ret;
+  i32 ret;
   if (strcmp(msg, PASSWORD) == 0) {
     LOG_MSG(LOG_INFO, "Main server: New client logged in successfully!");
     SEND_MSG(sock, AUTH_PASS_OK);
@@ -79,7 +79,7 @@ execute_auth(int i, char *msg, int sock, client_data_t *data, int argc,
 }
 
 void
-execute_setup(int i, char *msg, int sock, client_data_t *data, int argc,
+execute_setup(i32 i, char *msg, i32 sock, client_data_t *data, i32 argc,
               char *argv[])
 {
 }
@@ -97,10 +97,10 @@ typedef enum motor_action {
 } motor_action_t;
 
 void
-execute_command(int i, char *msg, int sock, client_data_t *data, int argc,
+execute_command(i32 i, char *msg, i32 sock, client_data_t *data, i32 argc,
                 char *argv[])
 {
-  int ret;
+  i32 ret;
 
   if (argc < 1) {
     send(sock, COMMAND_ERR_ARGC, strlen(COMMAND_ERR_ARGC), 0);
@@ -132,7 +132,7 @@ execute_command(int i, char *msg, int sock, client_data_t *data, int argc,
       return;
     }
 
-    int pin = strtol(argv[1], NULL, 0);
+    i32 pin = strtol(argv[1], NULL, 0);
     if (errno == EINVAL || errno == ERANGE) {
       LOG_MSG(LOG_ERROR, "Main server: GPIO: Invalid GPIO pin specified.");
       SEND_MSG(sock, COMMAND_ERR_INV_ARG);
@@ -184,7 +184,7 @@ execute_command(int i, char *msg, int sock, client_data_t *data, int argc,
         SEND_MSG(sock, COMMAND_ERR_INV_ARG);
       }
 
-      int value = strtol(argv[0], NULL, 0);
+      i32 value = strtol(argv[0], NULL, 0);
       if (errno == EINVAL || errno == ERANGE) {
         LOG_MSG(LOG_ERROR,
                 "Main server: GPIO: GPIO value specified is not a number.");
@@ -204,7 +204,7 @@ execute_command(int i, char *msg, int sock, client_data_t *data, int argc,
       return;
     }
 
-    int motor_id = strtol(argv[1], NULL, 0);
+    i32 motor_id = strtol(argv[1], NULL, 0);
     if (errno == EINVAL || errno == ERANGE ||
         motor_id >= app.system_settings.hardware.motors.cnt) {
       LOG_MSG(LOG_ERROR, "Main server: MOTOR: Invalid motor ID specified.");
@@ -290,7 +290,7 @@ execute_command(int i, char *msg, int sock, client_data_t *data, int argc,
 }
 
 void
-parse_message(int i, char *msg, client_data_t *data, int sock)
+parse_message(i32 i, char *msg, client_data_t *data, i32 sock)
 {
   if (msg == nullptr) {
     LOG_MSG(LOG_ERROR, "parse_message: `msg` is NULL! Ignoring message.");
@@ -304,7 +304,7 @@ parse_message(int i, char *msg, client_data_t *data, int sock)
 
   char const *delim = " \t";
 
-  int argc = 1;
+  i32 argc = 1;
   char *msg_clone[1024];
   strncpy((char *) msg_clone, msg, sizeof(msg_clone));
   char *argv[10] = { 0 }, *cur = strtok((char *) msg_clone, delim);
@@ -347,10 +347,10 @@ main_server_loop(void *data)
      }
   };
 
-  int opt = true;
-  int master_socket, addrlen, new_socket, client_socket[30],
+  i32 opt = true;
+  i32 master_socket, addrlen, new_socket, client_socket[30],
       max_clients = 30, activity, i, valread, sd;
-  int max_sd;
+  i32 max_sd;
   struct sockaddr_in address;
 
   char buffer[1025] = { 0 };

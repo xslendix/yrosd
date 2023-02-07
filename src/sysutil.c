@@ -17,7 +17,7 @@
 pid_t
 proc_find(char const *proc_name)
 {
-  int pid = -1;
+  i32 pid = -1;
   char cmdPath[MAX_LEN];
   char cmdLine[MAX_LEN];
   char *pos;
@@ -27,7 +27,7 @@ proc_find(char const *proc_name)
   if (dp != NULL) {
     struct dirent *dirp;
     while (pid < 0 && (dirp = readdir(dp))) {
-      int id = atoi(dirp->d_name);
+      i32 id = atoi(dirp->d_name);
       if (id > 0) {
         sprintf(cmdPath, "/proc/%s/cmdline", dirp->d_name);
         cmdFile = fopen(cmdPath, "r");

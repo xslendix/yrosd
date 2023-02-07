@@ -294,46 +294,46 @@ extern "C" {
 
 double time_time(void);
 void time_sleep(double seconds);
-char *pigpio_error(int errnum);
+char *pigpio_error(i32 errnum);
 unsigned pigpiod_if_version(void);
-int pigpio_start(const char *addrStr, const char *portStr);
-void pigpio_stop(int pi);
-int set_mode(int pi, unsigned gpio, unsigned mode);
-int get_mode(int pi, unsigned gpio);
-int set_pull_up_down(int pi, unsigned gpio, unsigned pud);
-int gpio_read(int pi, unsigned gpio);
-int gpio_write(int pi, unsigned gpio, unsigned level);
-int set_PWM_dutycycle(int pi, unsigned user_gpio, unsigned dutycycle);
-int get_PWM_dutycycle(int pi, unsigned user_gpio);
-int set_PWM_range(int pi, unsigned user_gpio, unsigned range);
-int get_PWM_range(int pi, unsigned user_gpio);
-int get_PWM_real_range(int pi, unsigned user_gpio);
-int set_PWM_frequency(int pi, unsigned user_gpio, unsigned frequency);
-int get_PWM_frequency(int pi, unsigned user_gpio);
-int set_servo_pulsewidth(int pi, unsigned user_gpio, unsigned pulsewidth);
-int get_servo_pulsewidth(int pi, unsigned user_gpio);
-int notify_open(int pi);
-int notify_begin(int pi, unsigned handle, u32 bits);
-int notify_pause(int pi, unsigned handle);
-int notify_close(int pi, unsigned handle);
-int set_watchdog(int pi, unsigned user_gpio, unsigned timeout);
-int set_glitch_filter(int pi, unsigned user_gpio, unsigned steady);
-int set_noise_filter(int pi, unsigned user_gpio, unsigned steady,
+i32 pigpio_start(const char *addrStr, const char *portStr);
+void pigpio_stop(i32 pi);
+i32 set_mode(i32 pi, unsigned gpio, unsigned mode);
+i32 get_mode(i32 pi, unsigned gpio);
+i32 set_pull_up_down(i32 pi, unsigned gpio, unsigned pud);
+i32 gpio_read(i32 pi, unsigned gpio);
+i32 gpio_write(i32 pi, unsigned gpio, unsigned level);
+i32 set_PWM_dutycycle(i32 pi, unsigned user_gpio, unsigned dutycycle);
+i32 get_PWM_dutycycle(i32 pi, unsigned user_gpio);
+i32 set_PWM_range(i32 pi, unsigned user_gpio, unsigned range);
+i32 get_PWM_range(i32 pi, unsigned user_gpio);
+i32 get_PWM_real_range(i32 pi, unsigned user_gpio);
+i32 set_PWM_frequency(i32 pi, unsigned user_gpio, unsigned frequency);
+i32 get_PWM_frequency(i32 pi, unsigned user_gpio);
+i32 set_servo_pulsewidth(i32 pi, unsigned user_gpio, unsigned pulsewidth);
+i32 get_servo_pulsewidth(i32 pi, unsigned user_gpio);
+i32 notify_open(i32 pi);
+i32 notify_begin(i32 pi, unsigned handle, u32 bits);
+i32 notify_pause(i32 pi, unsigned handle);
+i32 notify_close(i32 pi, unsigned handle);
+i32 set_watchdog(i32 pi, unsigned user_gpio, unsigned timeout);
+i32 set_glitch_filter(i32 pi, unsigned user_gpio, unsigned steady);
+i32 set_noise_filter(i32 pi, unsigned user_gpio, unsigned steady,
                      unsigned active);
-u32 read_bank_1(int pi);
-u32 read_bank_2(int pi);
-int clear_bank_1(int pi, u32 bits);
-int clear_bank_2(int pi, u32 bits);
-int set_bank_1(int pi, u32 bits);
-int set_bank_2(int pi, u32 bits);
-int hardware_clock(int pi, unsigned gpio, unsigned clkfreq);
-int hardware_PWM(int pi, unsigned gpio, unsigned PWMfreq, u32 PWMduty);
-u32 get_current_tick(int pi);
-u32 get_hardware_revision(int pi);
-u32 get_pigpio_version(int pi);
+u32 read_bank_1(i32 pi);
+u32 read_bank_2(i32 pi);
+i32 clear_bank_1(i32 pi, u32 bits);
+i32 clear_bank_2(i32 pi, u32 bits);
+i32 set_bank_1(i32 pi, u32 bits);
+i32 set_bank_2(i32 pi, u32 bits);
+i32 hardware_clock(i32 pi, unsigned gpio, unsigned clkfreq);
+i32 hardware_PWM(i32 pi, unsigned gpio, unsigned PWMfreq, u32 PWMduty);
+u32 get_current_tick(i32 pi);
+u32 get_hardware_revision(i32 pi);
+u32 get_pigpio_version(i32 pi);
 typedef struct {
-  uint16_t func;
-  uint16_t size;
+  u16 func;
+  u16 size;
 } gpioHeader_t;
 typedef struct {
   size_t size;
@@ -358,95 +358,95 @@ typedef struct {
   u32 gpioOff;
   u32 usDelay;
 } gpioPulse_t;
-int wave_clear(int pi);
-int wave_add_new(int pi);
-int wave_add_generic(int pi, unsigned numPulses, gpioPulse_t *pulses);
-int wave_add_serial(int pi, unsigned user_gpio, unsigned baud,
+i32 wave_clear(i32 pi);
+i32 wave_add_new(i32 pi);
+i32 wave_add_generic(i32 pi, unsigned numPulses, gpioPulse_t *pulses);
+i32 wave_add_serial(i32 pi, unsigned user_gpio, unsigned baud,
                     unsigned data_bits, unsigned stop_bits, unsigned offset,
                     unsigned numBytes, char *str);
-int wave_create(int pi);
-int wave_create_and_pad(int pi, int percent);
-int wave_delete(int pi, unsigned wave_id);
-int wave_send_once(int pi, unsigned wave_id);
-int wave_send_repeat(int pi, unsigned wave_id);
-int wave_send_using_mode(int pi, unsigned wave_id, unsigned mode);
-int wave_chain(int pi, char *buf, unsigned bufSize);
-int wave_tx_at(int pi);
-int wave_tx_busy(int pi);
-int wave_tx_stop(int pi);
-int wave_get_micros(int pi);
-int wave_get_high_micros(int pi);
-int wave_get_max_micros(int pi);
-int wave_get_pulses(int pi);
-int wave_get_high_pulses(int pi);
-int wave_get_max_pulses(int pi);
-int wave_get_cbs(int pi);
-int wave_get_high_cbs(int pi);
-int wave_get_max_cbs(int pi);
-int gpio_trigger(int pi, unsigned user_gpio, unsigned pulseLen, unsigned level);
-int store_script(int pi, char *script);
-int run_script(int pi, unsigned script_id, unsigned numPar, u32 *param);
-int update_script(int pi, unsigned script_id, unsigned numPar, u32 *param);
-int script_status(int pi, unsigned script_id, u32 *param);
-int stop_script(int pi, unsigned script_id);
-int delete_script(int pi, unsigned script_id);
-int bb_serial_read_open(int pi, unsigned user_gpio, unsigned baud,
+i32 wave_create(i32 pi);
+i32 wave_create_and_pad(i32 pi, i32 percent);
+i32 wave_delete(i32 pi, unsigned wave_id);
+i32 wave_send_once(i32 pi, unsigned wave_id);
+i32 wave_send_repeat(i32 pi, unsigned wave_id);
+i32 wave_send_using_mode(i32 pi, unsigned wave_id, unsigned mode);
+i32 wave_chain(i32 pi, char *buf, unsigned bufSize);
+i32 wave_tx_at(i32 pi);
+i32 wave_tx_busy(i32 pi);
+i32 wave_tx_stop(i32 pi);
+i32 wave_get_micros(i32 pi);
+i32 wave_get_high_micros(i32 pi);
+i32 wave_get_max_micros(i32 pi);
+i32 wave_get_pulses(i32 pi);
+i32 wave_get_high_pulses(i32 pi);
+i32 wave_get_max_pulses(i32 pi);
+i32 wave_get_cbs(i32 pi);
+i32 wave_get_high_cbs(i32 pi);
+i32 wave_get_max_cbs(i32 pi);
+i32 gpio_trigger(i32 pi, unsigned user_gpio, unsigned pulseLen, unsigned level);
+i32 store_script(i32 pi, char *script);
+i32 run_script(i32 pi, unsigned script_id, unsigned numPar, u32 *param);
+i32 update_script(i32 pi, unsigned script_id, unsigned numPar, u32 *param);
+i32 script_status(i32 pi, unsigned script_id, u32 *param);
+i32 stop_script(i32 pi, unsigned script_id);
+i32 delete_script(i32 pi, unsigned script_id);
+i32 bb_serial_read_open(i32 pi, unsigned user_gpio, unsigned baud,
                         unsigned data_bits);
-int bb_serial_read(int pi, unsigned user_gpio, void *buf, size_t bufSize);
-int bb_serial_read_close(int pi, unsigned user_gpio);
-int bb_serial_invert(int pi, unsigned user_gpio, unsigned invert);
-int i2c_open(int pi, unsigned i2c_bus, unsigned i2c_addr, unsigned i2c_flags);
-int i2c_close(int pi, unsigned handle);
-int i2c_write_quick(int pi, unsigned handle, unsigned bit);
-int i2c_write_byte(int pi, unsigned handle, unsigned bVal);
-int i2c_read_byte(int pi, unsigned handle);
-int i2c_write_byte_data(int pi, unsigned handle, unsigned i2c_reg,
+i32 bb_serial_read(i32 pi, unsigned user_gpio, void *buf, size_t bufSize);
+i32 bb_serial_read_close(i32 pi, unsigned user_gpio);
+i32 bb_serial_invert(i32 pi, unsigned user_gpio, unsigned invert);
+i32 i2c_open(i32 pi, unsigned i2c_bus, unsigned i2c_addr, unsigned i2c_flags);
+i32 i2c_close(i32 pi, unsigned handle);
+i32 i2c_write_quick(i32 pi, unsigned handle, unsigned bit);
+i32 i2c_write_byte(i32 pi, unsigned handle, unsigned bVal);
+i32 i2c_read_byte(i32 pi, unsigned handle);
+i32 i2c_write_byte_data(i32 pi, unsigned handle, unsigned i2c_reg,
                         unsigned bVal);
-int i2c_write_word_data(int pi, unsigned handle, unsigned i2c_reg,
+i32 i2c_write_word_data(i32 pi, unsigned handle, unsigned i2c_reg,
                         unsigned wVal);
-int i2c_read_byte_data(int pi, unsigned handle, unsigned i2c_reg);
-int i2c_read_word_data(int pi, unsigned handle, unsigned i2c_reg);
-int i2c_process_call(int pi, unsigned handle, unsigned i2c_reg, unsigned wVal);
-int i2c_write_block_data(int pi, unsigned handle, unsigned i2c_reg, char *buf,
+i32 i2c_read_byte_data(i32 pi, unsigned handle, unsigned i2c_reg);
+i32 i2c_read_word_data(i32 pi, unsigned handle, unsigned i2c_reg);
+i32 i2c_process_call(i32 pi, unsigned handle, unsigned i2c_reg, unsigned wVal);
+i32 i2c_write_block_data(i32 pi, unsigned handle, unsigned i2c_reg, char *buf,
                          unsigned count);
-int i2c_read_block_data(int pi, unsigned handle, unsigned i2c_reg, char *buf);
-int i2c_block_process_call(int pi, unsigned handle, unsigned i2c_reg, char *buf,
+i32 i2c_read_block_data(i32 pi, unsigned handle, unsigned i2c_reg, char *buf);
+i32 i2c_block_process_call(i32 pi, unsigned handle, unsigned i2c_reg, char *buf,
                            unsigned count);
-int i2c_read_i2c_block_data(int pi, unsigned handle, unsigned i2c_reg,
+i32 i2c_read_i2c_block_data(i32 pi, unsigned handle, unsigned i2c_reg,
                             char *buf, unsigned count);
 
-int i2c_write_i2c_block_data(int pi, unsigned handle, unsigned i2c_reg,
+i32 i2c_write_i2c_block_data(i32 pi, unsigned handle, unsigned i2c_reg,
                              char *buf, unsigned count);
-int i2c_read_device(int pi, unsigned handle, char *buf, unsigned count);
-int i2c_write_device(int pi, unsigned handle, char *buf, unsigned count);
-int i2c_zip(int pi, unsigned handle, char *inBuf, unsigned inLen, char *outBuf,
+i32 i2c_read_device(i32 pi, unsigned handle, char *buf, unsigned count);
+i32 i2c_write_device(i32 pi, unsigned handle, char *buf, unsigned count);
+i32 i2c_zip(i32 pi, unsigned handle, char *inBuf, unsigned inLen, char *outBuf,
             unsigned outLen);
-int bb_i2c_open(int pi, unsigned SDA, unsigned SCL, unsigned baud);
-int bb_i2c_close(int pi, unsigned SDA);
-int bb_i2c_zip(int pi, unsigned SDA, char *inBuf, unsigned inLen, char *outBuf,
+i32 bb_i2c_open(i32 pi, unsigned SDA, unsigned SCL, unsigned baud);
+i32 bb_i2c_close(i32 pi, unsigned SDA);
+i32 bb_i2c_zip(i32 pi, unsigned SDA, char *inBuf, unsigned inLen, char *outBuf,
                unsigned outLen);
-int bb_spi_open(int pi, unsigned CS, unsigned MISO, unsigned MOSI,
+i32 bb_spi_open(i32 pi, unsigned CS, unsigned MISO, unsigned MOSI,
                 unsigned SCLK, unsigned baud, unsigned spi_flags);
-int bb_spi_close(int pi, unsigned CS);
-int bb_spi_xfer(int pi, unsigned CS, char *txBuf, char *rxBuf, unsigned count);
-int spi_open(int pi, unsigned spi_channel, unsigned baud, unsigned spi_flags);
-int spi_close(int pi, unsigned handle);
-int spi_read(int pi, unsigned handle, char *buf, unsigned count);
-int spi_write(int pi, unsigned handle, char *buf, unsigned count);
-int spi_xfer(int pi, unsigned handle, char *txBuf, char *rxBuf, unsigned count);
-int serial_open(int pi, char *ser_tty, unsigned baud, unsigned ser_flags);
-int serial_close(int pi, unsigned handle);
-int serial_write_byte(int pi, unsigned handle, unsigned bVal);
-int serial_read_byte(int pi, unsigned handle);
-int serial_write(int pi, unsigned handle, char *buf, unsigned count);
-int serial_read(int pi, unsigned handle, char *buf, unsigned count);
-int serial_data_available(int pi, unsigned handle);
-int custom_1(int pi, unsigned arg1, unsigned arg2, char *argx, unsigned argc);
-int custom_2(int pi, unsigned arg1, char *argx, unsigned argc, char *retBuf,
+i32 bb_spi_close(i32 pi, unsigned CS);
+i32 bb_spi_xfer(i32 pi, unsigned CS, char *txBuf, char *rxBuf, unsigned count);
+i32 spi_open(i32 pi, unsigned spi_channel, unsigned baud, unsigned spi_flags);
+i32 spi_close(i32 pi, unsigned handle);
+i32 spi_read(i32 pi, unsigned handle, char *buf, unsigned count);
+i32 spi_write(i32 pi, unsigned handle, char *buf, unsigned count);
+i32 spi_xfer(i32 pi, unsigned handle, char *txBuf, char *rxBuf, unsigned count);
+i32 serial_open(i32 pi, char *ser_tty, unsigned baud, unsigned ser_flags);
+i32 serial_close(i32 pi, unsigned handle);
+i32 serial_write_byte(i32 pi, unsigned handle, unsigned bVal);
+i32 serial_read_byte(i32 pi, unsigned handle);
+i32 serial_write(i32 pi, unsigned handle, char *buf, unsigned count);
+i32 serial_read(i32 pi, unsigned handle, char *buf, unsigned count);
+i32 serial_data_available(i32 pi, unsigned handle);
+i32 custom_1(i32 pi, unsigned arg1, unsigned arg2, char *argx, unsigned argc);
+i32 custom_2(i32 pi, unsigned arg1, char *argx, unsigned argc, char *retBuf,
              unsigned retMax);
-int get_pad_strength(int pi, unsigned pad);
-int set_pad_strength(int pi, unsigned pad, unsigned padStrength);
-int shell_(int pi, char *scriptName, char *scriptString);
+i32 get_pad_strength(i32 pi, unsigned pad);
+i32 set_pad_strength(i32 pi, unsigned pad, unsigned padStrength);
+i32 shell_(i32 pi, char *scriptName, char *scriptString);
 
 typedef enum {
   pigif_bad_send           = -2000,

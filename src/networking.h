@@ -16,7 +16,7 @@ typedef struct wifi_network {
 } wifi_network_t;
 
 typedef struct wifi_network_list {
-  int cnt;
+  i32 cnt;
   wifi_network_t *networks;
 } wifi_network_list_t;
 

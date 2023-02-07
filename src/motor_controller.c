@@ -41,7 +41,7 @@ motor_controller_set_speed(motor_controller_t *controller, motor_t *motor,
   LOG_MSG(LOG_DEBUG, "motor_controller: set_speed(%f)", speed);
 
   u16 const MAX_SPEED = 480;
-  int _speed          = speed * MAX_SPEED;
+  i32 _speed          = speed * MAX_SPEED;
 
   bool backwards = false;
 
