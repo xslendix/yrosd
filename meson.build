@@ -18,9 +18,9 @@ sources = [
   'src/networking.c',
   'src/logging.c',
   'src/server.c',
-  'src/main.c',
   'src/settings.c',
   'src/sysutil.c',
+  'src/yrosd.c',
   ]
 
 if get_option('debugpigpio').enabled()

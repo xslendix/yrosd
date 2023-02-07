@@ -1,9 +1,9 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#include <stdbool.h>
-
 #include "common.h"
+
+#include <stdbool.h>
 
 typedef struct motor {
   struct {

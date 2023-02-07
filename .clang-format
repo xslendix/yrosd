@@ -1,14 +1,50 @@
----
-Language: Cpp
-BasedOnStyle: WebKit
-SpaceAfterTemplateKeyword: false
-AlignEscapedNewlines: true
-AlignTrailingComments: true
-BreakBeforeInheritanceComma: true
-BreakConstructorInitializers: BeforeComma
-IndentPPDirectives: AfterHash
-BreakBeforeBraces: Custom
+﻿---
+AlignArrayOfStructures: Right
+AlignConsecutiveBitFields:
+  Enabled: 'true'
+  AcrossEmptyLines: 'false'
+  AcrossComments: 'true'
+
+AlignAfterOpenBracket: Align
+AlignConsecutiveMacros: 'true'
+AlignConsecutiveAssignments: 'true'
+AlignConsecutiveDeclarations: 'false'
+AlignEscapedNewlines: Right
+AlignTrailingComments: 'true'
+AllowShortBlocksOnASingleLine: 'true'
+AllowShortCaseLabelsOnASingleLine: 'true'
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: 'true'
+AlwaysBreakAfterReturnType: AllDefinitions
+AlwaysBreakBeforeMultilineStrings: 'false'
+BinPackArguments: 'true'
+BinPackParameters: 'true'
+BreakAfterJavaFieldAnnotations: 'true'
 BraceWrapping:
-    AfterFunction: true
-NamespaceIndentation: None
-SortIncludes: false
+  AfterCaseLabel: 'true'
+  AfterFunction: 'true'
+  AfterNamespace: 'true'
+BreakBeforeBraces: Custom
+Cpp11BracedListStyle: 'false'
+IncludeBlocks: Regroup
+IndentCaseLabels: 'false'
+IndentPPDirectives: None
+IndentWidth: '2'
+KeepEmptyLinesAtTheStartOfBlocks: 'false'
+Language: Cpp
+PointerAlignment: Right
+ReflowComments: 'true'
+SortIncludes: 'true'
+SpaceAfterCStyleCast: 'true'
+SpaceAfterLogicalNot: 'false'
+SpaceBeforeAssignmentOperators: 'true'
+SpaceBeforeCpp11BracedList: 'true'
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: 'true'
+SpaceInEmptyParentheses: 'false'
+SpacesInCStyleCastParentheses: 'false'
+SpacesInParentheses: 'false'
+SpacesInSquareBrackets: 'false'
+UseTab: Never
+...

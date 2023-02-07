@@ -5,9 +5,9 @@
 extern "C" {
 #endif
 
-#include <pthread.h>
-
 #include "common.h"
+
+#include <pthread.h>
 
 pthread_t *start_main_server(void);
 
@@ -22,4 +22,3 @@ typedef enum c_mode {
 #endif
 
 #endif // SERVER_H
-

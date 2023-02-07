@@ -4,13 +4,14 @@
 #include "logging.h"
 
 u64 pin_values = 0;
-u64 pin_modes = 0;
-u64 pin_puds = 0;
+u64 pin_modes  = 0;
+u64 pin_puds   = 0;
 
 int
 pigpio_start(const char *addrStr, const char *portStr)
 {
-  LOG_MSG(LOG_DEBUG, "PigpioSim: pigpio_start(\"%s\", \"%s\")", addrStr, portStr);
+  LOG_MSG(LOG_DEBUG, "PigpioSim: pigpio_start(\"%s\", \"%s\")", addrStr,
+          portStr);
   return 0;
 }
 
@@ -54,6 +55,7 @@ set_pull_up_down(int pi, unsigned gpio, unsigned pud)
 int
 hardware_PWM(int pi, unsigned gpio, unsigned PWMfreq, u32 PWMduty)
 {
-  LOG_MSG(LOG_DEBUG, "PigpioSim: hardware_PWM(%d, %d, %d, %d)", pi, gpio, PWMfreq, PWMduty);
+  LOG_MSG(LOG_DEBUG, "PigpioSim: hardware_PWM(%d, %d, %d, %d)", pi, gpio,
+          PWMfreq, PWMduty);
   return 0;
 }

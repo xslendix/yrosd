@@ -7,9 +7,8 @@ extern "C" {
 
 #include "common.h"
 
-#include <stdbool.h>
-
 #include <NetworkManager.h>
+#include <stdbool.h>
 
 typedef struct wifi_network {
   char *ssid;

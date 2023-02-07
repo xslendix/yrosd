@@ -1,11 +1,11 @@
 #include "common.h"
 
+#include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <string.h>
-#include <ctype.h>
-#include <time.h>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
 
 char *
 trim_string_fast(char *str)
@@ -15,13 +15,13 @@ trim_string_fast(char *str)
   if (*str == '\0')
     return str;
 
-  while(isspace((unsigned char)*str)) str++;
+  while (isspace((unsigned char) *str)) str++;
 
-  if(*str == 0)
+  if (*str == 0)
     return str;
 
   end = str + strlen(str) - 1;
-  while(end > str && (isspace(*end) || isblank(*end))) end--;
+  while (end > str && (isspace(*end) || isblank(*end))) end--;
 
   end[1] = '\0';
 
@@ -74,4 +74,3 @@ is_str_alphanumeric(char *str)
   }
   return true;
 }
-

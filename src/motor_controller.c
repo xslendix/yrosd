@@ -1,22 +1,29 @@
 #include "motor_controller.h"
 
-#include "yrosd.h"
 #include "logging.h"
-
 #include "pigpiod_if2.h"
+#include "yrosd.h"
 
-i8 motor_controller_init(motor_controller_t *controller)
+i8
+motor_controller_init(motor_controller_t *controller)
 {
   controller->initialised = true;
 
   // FIXME: Check configuration at startup by checking count.
   for (i32 i = 0; i < app.system_settings.hardware.motors.cnt; i++) {
-    set_mode(app.pi, app.system_settings.hardware.motors.motors[i].pins.pwm, PI_OUTPUT);
-    set_mode(app.pi, app.system_settings.hardware.motors.motors[i].pins.enabled, PI_OUTPUT);
-    set_mode(app.pi, app.system_settings.hardware.motors.motors[i].pins.direction, PI_OUTPUT);
+    set_mode(app.pi, app.system_settings.hardware.motors.motors[i].pins.pwm,
+             PI_OUTPUT);
+    set_mode(app.pi, app.system_settings.hardware.motors.motors[i].pins.enabled,
+             PI_OUTPUT);
+    set_mode(app.pi,
+             app.system_settings.hardware.motors.motors[i].pins.direction,
+             PI_OUTPUT);
 
-    set_mode(app.pi, app.system_settings.hardware.motors.motors[i].pins.fault, PI_INPUT);
-    set_pull_up_down(app.pi, app.system_settings.hardware.motors.motors[i].pins.fault, PI_PUD_UP);
+    set_mode(app.pi, app.system_settings.hardware.motors.motors[i].pins.fault,
+             PI_INPUT);
+    set_pull_up_down(app.pi,
+                     app.system_settings.hardware.motors.motors[i].pins.fault,
+                     PI_PUD_UP);
 
     app.system_settings.hardware.motors.motors[i].enabled = true;
   }
@@ -24,7 +31,9 @@ i8 motor_controller_init(motor_controller_t *controller)
   return 0;
 }
 
-i8 motor_controller_set_speed(motor_controller_t *controller, motor_t *motor, double speed)
+i8
+motor_controller_set_speed(motor_controller_t *controller, motor_t *motor,
+                           double speed)
 {
   if (!controller->initialised)
     return -1;
@@ -32,7 +41,7 @@ i8 motor_controller_set_speed(motor_controller_t *controller, motor_t *motor, do
   LOG_MSG(LOG_DEBUG, "motor_controller: set_speed(%f)", speed);
 
   u16 const MAX_SPEED = 480;
-  int _speed = speed * MAX_SPEED;
+  int _speed          = speed * MAX_SPEED;
 
   bool backwards = false;
 
@@ -49,8 +58,8 @@ i8 motor_controller_set_speed(motor_controller_t *controller, motor_t *motor, do
   return 0;
 }
 
-bool motor_controller_get_fault(motor_controller_t *controller, motor_t *motor)
+bool
+motor_controller_get_fault(motor_controller_t *controller, motor_t *motor)
 {
   return gpio_read(app.pi, motor->pins.fault);
 }
-

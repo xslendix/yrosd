@@ -1,17 +1,16 @@
 #include "yrosd.h"
 
+#include "common.h"
+#include "logging.h"
+#include "pigpiod_if2.h"
+#include "server.h"
+#include "settings.h"
+#include "sysutil.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
-#include "common.h"
-#include "logging.h"
-#include "sysutil.h"
-#include "settings.h"
-#include "server.h"
-
-#include "pigpiod_if2.h"
 
 app_t app;
 
@@ -19,7 +18,7 @@ void
 clean_quit(void)
 {
   /* TODO: Free the memory! */
-  //free_system_settings(system_settings);
+  // free_system_settings(system_settings);
 
   pigpio_stop(app.pi);
 }
@@ -39,16 +38,15 @@ main(i32 argc, char **argv)
         LOG_MSG(LOG_FATAL, "Cannot find daemon process.");
       kill(proc, SIGTERM);
       return EXIT_SUCCESS;
-    }
-    else if (!strcmp(argv[i], "-R") || !strcmp(argv[i], "--reload")) {
+    } else if (!strcmp(argv[i], "-R") || !strcmp(argv[i], "--reload")) {
       pid_t proc = proc_find("yrosd");
       if (proc < 0)
         LOG_MSG(LOG_FATAL, "Cannot find daemon process.");
       kill(proc, 1);
       return EXIT_SUCCESS;
-    }
-    else if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--version")) {
-      printf("YROS Daemon version %s (Protocol %s).\n", VERSION, PROTOCOL_VERSION);
+    } else if (!strcmp(argv[i], "-V") || !strcmp(argv[i], "--version")) {
+      printf("YROS Daemon version %s (Protocol %s).\n", VERSION,
+             PROTOCOL_VERSION);
       return EXIT_SUCCESS;
     } else {
       LOG_MSG(LOG_FATAL, "Invalid argument: `%s`", argv[i]);
@@ -70,7 +68,7 @@ main(i32 argc, char **argv)
     LOG_MSG(LOG_FATAL, "Cannot motor controller.");
 
   app.running_port = random_u16(8000, 10000);
-  app.version = "23.1";
+  app.version      = "23.1";
 
   LOG_MSG(LOG_INFO, "Loading system configuration file.");
   char const *syssettings_path = find_system_settings_path();
@@ -82,14 +80,14 @@ main(i32 argc, char **argv)
 
   LOG_MSG(LOG_INFO, "Loading user configuration file.");
   char const *user_settings_path = find_user_settings_path();
-  app.user_settings = load_user_settings(user_settings_path);
+  app.user_settings              = load_user_settings(user_settings_path);
   if (!app.user_settings.is_valid) {
     LOG_MSG(LOG_FIXME, "Implement SETUP MODE.");
     LOG_MSG(LOG_FATAL, "Cannot proceed further, invalid user configuration.");
   }
   print_user_settings(app.user_settings);
 
-  pthread_t *thread = start_broadcasting();
+  pthread_t *thread      = start_broadcasting();
   pthread_t *thread_auth = start_main_server();
   pthread_join(*thread, nullptr);
   pthread_join(*thread_auth, nullptr);
@@ -100,16 +98,18 @@ main(i32 argc, char **argv)
 void
 reload_signal_handler(int signum)
 {
-  (void)signum;
+  (void) signum;
   LOG_MSG(LOG_INFO, "Reloading system configuration file...");
   char const *system_settings_path = find_system_settings_path();
   if (!system_settings_path) {
     LOG_MSG(LOG_ERROR, "Cannot find path of `syssettings.toml`!");
     return;
   }
-  system_settings_t system_settings = load_system_settings(system_settings_path);
+  system_settings_t system_settings =
+      load_system_settings(system_settings_path);
   if (!system_settings.is_valid) {
-    LOG_MSG(LOG_ERROR, "Invalid system configuration. Using previous configuration.");
+    LOG_MSG(LOG_ERROR,
+            "Invalid system configuration. Using previous configuration.");
     return;
   }
   app.system_settings = system_settings;
@@ -121,4 +121,3 @@ initialise_signals(void)
 {
   signal(1, reload_signal_handler);
 }
-

@@ -24,8 +24,10 @@ typedef struct logging {
 extern logging_t *DEFAULT_LOGGER;
 
 logging_t *init_logging();
-void log_msg(logging_t *logger, log_level_t const level, char const *format, ...);
-#define LOG_MSG(level, format, ...) log_msg(DEFAULT_LOGGER, level, format, ##__VA_ARGS__);
+void log_msg(logging_t *logger, log_level_t const level, char const *format,
+             ...);
+#define LOG_MSG(level, format, ...)                                            \
+  log_msg(DEFAULT_LOGGER, level, format, ##__VA_ARGS__);
 void free_logging(logging_t *logger);
 
 #if defined(__cplusplus)

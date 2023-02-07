@@ -1,11 +1,11 @@
 #ifndef SETTINGS_H
 #define SETTINGS_H
 
-#include <stdbool.h>
-
 #include "common.h"
-#include "types.h"
 #include "networking.h"
+#include "types.h"
+
+#include <stdbool.h>
 
 #if defined(__cplusplus)
 extern "C" {
@@ -28,8 +28,7 @@ typedef struct system_settings {
   } video_streaming;
   struct {
     drive_mode_t mode;
-    i32 motor_top_left, motor_top_right,
-        motor_bottom_left, motor_bottom_right;
+    i32 motor_top_left, motor_top_right, motor_bottom_left, motor_bottom_right;
   } driving;
 
   bool is_valid;
@@ -48,7 +47,7 @@ typedef struct user_settings {
   struct {
     wifi_network_list_t wifi_networks;
   } conectivity;
-  
+
   bool is_valid;
 } user_settings_t;
 

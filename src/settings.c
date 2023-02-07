@@ -5,10 +5,9 @@
 #include "src/networking.h"
 #include "sysutil.h"
 
-#include <string.h>
 #include <errno.h>
 #include <stdlib.h>
-
+#include <string.h>
 #include <toml.h>
 
 #pragma region System Settings
@@ -29,13 +28,10 @@ get_driving_mode_from_str(char *str)
   return -1; /* Just because clangd complains :P */
 }
 
-char const *paths_syssettings[] = {
-  "/data/syssettings.toml",
-  "/etc/syssettings.toml",
-  "./syssettings.toml",
-  "../syssettings.toml",
-  nullptr
-};
+char const *paths_syssettings[] = { "/data/syssettings.toml",
+                                    "/etc/syssettings.toml",
+                                    "./syssettings.toml", "../syssettings.toml",
+                                    nullptr };
 
 char const *
 find_system_settings_path(void)
@@ -55,22 +51,24 @@ system_settings_t
 load_system_settings(char const *file)
 {
   char err_[200];
-  char *err = err_;
-  system_settings_t sys = {0};
-  FILE *fp = fopen(file, "r");
+  char *err             = err_;
+  system_settings_t sys = { 0 };
+  FILE *fp              = fopen(file, "r");
 
-  sys.driving.motor_top_left = -1;
-  sys.driving.motor_top_right = -1;
-  sys.driving.motor_bottom_left = -1;
+  sys.driving.motor_top_left     = -1;
+  sys.driving.motor_top_right    = -1;
+  sys.driving.motor_bottom_left  = -1;
   sys.driving.motor_bottom_right = -1;
-#define throw_error() { \
-  LOG_MSG(LOG_ERROR, "Cannot parse system configuration file: %s", err); \
-  sys.is_valid = false; \
-  return sys; \
-}
+#define throw_error()                                                          \
+  {                                                                            \
+    LOG_MSG(LOG_ERROR, "Cannot parse system configuration file: %s", err);     \
+    sys.is_valid = false;                                                      \
+    return sys;                                                                \
+  }
 
   if (!fp) {
-    LOG_MSG(LOG_ERROR, "Cannot open system configuration file `%s`: %s", file, strerror(errno));
+    LOG_MSG(LOG_ERROR, "Cannot open system configuration file `%s`: %s", file,
+            strerror(errno));
     sys.is_valid = false;
     return sys;
   }
@@ -94,26 +92,28 @@ load_system_settings(char const *file)
       throw_error();
 
     sys.hardware.motors.cnt = toml_array_nelem(motors_arr);
-    sys.hardware.motors.motors = malloc(sys.hardware.motors.cnt * sizeof(motor_t));
+    sys.hardware.motors.motors =
+        malloc(sys.hardware.motors.cnt * sizeof(motor_t));
     if (!sys.hardware.motors.motors)
       throw_error();
 
     for (i32 i = 0; i < sys.hardware.motors.cnt; i++) {
-      toml_table_t *motor = toml_table_at(motors_arr, i);
-      toml_datum_t fault = toml_int_in(motor, "fault");
+      toml_table_t *motor                      = toml_table_at(motors_arr, i);
+      toml_datum_t fault                       = toml_int_in(motor, "fault");
       sys.hardware.motors.motors[i].pins.fault = fault.ok ? fault.u.i : 0;
-      toml_datum_t pwm = toml_int_in(motor, "pwm");
+      toml_datum_t pwm                         = toml_int_in(motor, "pwm");
       if (!pwm.ok)
         throw_error();
       sys.hardware.motors.motors[i].pins.pwm = pwm.u.i;
-      toml_datum_t enabled = toml_int_in(motor, "enabled");
+      toml_datum_t enabled                   = toml_int_in(motor, "enabled");
       sys.hardware.motors.motors[i].pins.enabled = enabled.ok ? enabled.u.i : 0;
       toml_datum_t direction = toml_int_in(motor, "direction");
       if (!direction.ok)
         throw_error();
       sys.hardware.motors.motors[i].pins.direction = direction.u.i;
       toml_datum_t inverted = toml_bool_in(motor, "inverted");
-      sys.hardware.motors.motors[i].inverted = inverted.ok ? inverted.u.b : false;
+      sys.hardware.motors.motors[i].inverted =
+          inverted.ok ? inverted.u.b : false;
       sys.hardware.motors.motors[i].enabled = false;
     }
   }
@@ -130,7 +130,8 @@ load_system_settings(char const *file)
 
     sys.video_streaming.enabled = enabled.u.b;
 
-    toml_datum_t camera_device = toml_string_in(video_streaming_cat, "CameraDevice");
+    toml_datum_t camera_device =
+        toml_string_in(video_streaming_cat, "CameraDevice");
     if (!camera_device.ok) {
       sys.video_streaming.camera_device = nullptr;
       break;
@@ -152,11 +153,11 @@ load_system_settings(char const *file)
     }
 
     /* HACK: This may or may not crash when freeing memory. */
-    char *mode_str = to_lower_string(trim_string_fast(mode.u.s));
+    char *mode_str   = to_lower_string(trim_string_fast(mode.u.s));
     sys.driving.mode = get_driving_mode_from_str(mode_str);
 
     bool is_single = strcmp(mode_str, "single") == 0;
-    bool is_tank = strcmp(mode_str, "tank") == 0;
+    bool is_tank   = strcmp(mode_str, "tank") == 0;
 
     toml_datum_t motor_top_left     = toml_int_in(driving, "MotorTopLeft");
     toml_datum_t motor_top_right    = toml_int_in(driving, "MotorTopRight");
@@ -184,7 +185,7 @@ load_system_settings(char const *file)
       throw_error();
     }
     sys.driving.motor_bottom_right = motor_bottom_right.u.i;
-    sys.driving.motor_bottom_left = motor_bottom_left.u.i;
+    sys.driving.motor_bottom_left  = motor_bottom_left.u.i;
   }
 
   sys.is_valid = true;
@@ -200,13 +201,16 @@ print_system_settings(system_settings_t settings)
   LOG_MSG(LOG_DEBUG, "  Motors:")
   for (i = 0; i < settings.hardware.motors.cnt; i++) {
     motor_t *motor = &settings.hardware.motors.motors[i];
-    LOG_MSG(LOG_DEBUG, "    - fault=%d pwm=%d enabled=%d dir=%d inv=%d", motor->pins.fault, motor->pins.pwm, motor->pins.enabled, motor->pins.direction, motor->inverted);
+    LOG_MSG(LOG_DEBUG, "    - fault=%d pwm=%d enabled=%d dir=%d inv=%d",
+            motor->pins.fault, motor->pins.pwm, motor->pins.enabled,
+            motor->pins.direction, motor->inverted);
   }
 
   LOG_MSG(LOG_DEBUG, "VIDEO STREAMING:")
   LOG_MSG(LOG_DEBUG, "  Enabled: %d", settings.video_streaming.enabled);
   if (settings.video_streaming.camera_device)
-    LOG_MSG(LOG_DEBUG, "  Camera Device: %s", settings.video_streaming.camera_device);
+    LOG_MSG(LOG_DEBUG, "  Camera Device: %s",
+            settings.video_streaming.camera_device);
 
   LOG_MSG(LOG_DEBUG, "DRIVING:")
   LOG_MSG(LOG_DEBUG, "  Mode: %d", settings.driving.mode);
@@ -215,35 +219,34 @@ print_system_settings(system_settings_t settings)
   if (settings.driving.motor_top_right != -1)
     LOG_MSG(LOG_DEBUG, "  MotorTopRight: %d", settings.driving.motor_top_right);
   if (settings.driving.motor_bottom_left != -1)
-    LOG_MSG(LOG_DEBUG, "  MotorBottomLeft: %d", settings.driving.motor_bottom_left);
+    LOG_MSG(LOG_DEBUG, "  MotorBottomLeft: %d",
+            settings.driving.motor_bottom_left);
   if (settings.driving.motor_bottom_right != -1)
-    LOG_MSG(LOG_DEBUG, "  MotorBottomRight: %d", settings.driving.motor_bottom_right);
+    LOG_MSG(LOG_DEBUG, "  MotorBottomRight: %d",
+            settings.driving.motor_bottom_right);
 }
 
 char const *
-drive_mode_str(drive_mode_t mode) {
+drive_mode_str(drive_mode_t mode)
+{
   switch (mode) {
-    case SINGLE: return "single";
-    case TANK: return "tank";
-    case QUADTANK: return "quadtank";
-    case MECANUM: return "mecanum";
+  case SINGLE: return "single";
+  case TANK: return "tank";
+  case QUADTANK: return "quadtank";
+  case MECANUM: return "mecanum";
   }
 
   return "(null)";
 }
 
-
 #pragma endregion
 
 #pragma region User Settings
 
-char const *paths_user_settings[] = {
-  "/data/usersettings.toml",
-  "/etc/usersettings.toml",
-  "./usersettings.toml",
-  "../usersettings.toml",
-  nullptr
-};
+char const *paths_user_settings[] = { "/data/usersettings.toml",
+                                      "/etc/usersettings.toml",
+                                      "./usersettings.toml",
+                                      "../usersettings.toml", nullptr };
 
 char const *
 find_user_settings_path(void)
@@ -263,15 +266,17 @@ user_settings_t
 load_user_settings(char const *file)
 {
   char err_[200];
-  char *err = err_;
+  char *err            = err_;
   user_settings_t user = { 0 };
-  FILE *fp = fopen(file, "r");
+  FILE *fp             = fopen(file, "r");
 
 #undef throw_error
-#define throw_error() LOG_MSG(LOG_FATAL, "Cannot parse user configuration file: %s", err);
+#define throw_error()                                                          \
+  LOG_MSG(LOG_FATAL, "Cannot parse user configuration file: %s", err);
 
-  if (!fp) 
-    LOG_MSG(LOG_FATAL, "Cannot open user configuration file `%s`: %s", file, strerror(errno));
+  if (!fp)
+    LOG_MSG(LOG_FATAL, "Cannot open user configuration file `%s`: %s", file,
+            strerror(errno));
 
   user.is_valid = false;
 
@@ -304,19 +309,21 @@ load_user_settings(char const *file)
     if (!conectivity_cat)
       return user;
 
-    toml_array_t *wifi_networks = toml_array_in(conectivity_cat, "WiFiNetworks");
+    toml_array_t *wifi_networks =
+        toml_array_in(conectivity_cat, "WiFiNetworks");
     if (!wifi_networks)
       return user;
 
     user.conectivity.wifi_networks.cnt = toml_array_nelem(wifi_networks);
-    user.conectivity.wifi_networks.networks = calloc(1, sizeof(wifi_network_t) * user.conectivity.wifi_networks.cnt);
+    user.conectivity.wifi_networks.networks =
+        calloc(1, sizeof(wifi_network_t) * user.conectivity.wifi_networks.cnt);
     if (!user.conectivity.wifi_networks.networks)
       return user;
 
     for (i32 i = 0; i < user.conectivity.wifi_networks.cnt; i++) {
       wifi_network_t *current = &user.conectivity.wifi_networks.networks[i];
-      toml_table_t *network = toml_table_at(wifi_networks, i);
-      toml_datum_t ssid = toml_string_in(network, "ssid");
+      toml_table_t *network   = toml_table_at(wifi_networks, i);
+      toml_datum_t ssid       = toml_string_in(network, "ssid");
       if (!ssid.ok) {
         err = "Conectivity.WiFiNetworks.*.ssid not set.";
         return user;
@@ -325,7 +332,7 @@ load_user_settings(char const *file)
 
       toml_datum_t password = toml_string_in(network, "password");
       if (!password.ok) {
-        err = "Conectivity.WiFiNetworks.*.password not set.";
+        err               = "Conectivity.WiFiNetworks.*.password not set.";
         current->password = nullptr;
         continue;
       }
@@ -347,9 +354,9 @@ print_user_settings(user_settings_t settings)
   LOG_MSG(LOG_DEBUG, "  WiFiNetworks:");
   for (i = 0; i < settings.conectivity.wifi_networks.cnt; i++) {
     wifi_network_t current = settings.conectivity.wifi_networks.networks[i];
-    LOG_MSG(LOG_DEBUG, "    ssid: `%s` password: `%s`", current.ssid, current.password);
+    LOG_MSG(LOG_DEBUG, "    ssid: `%s` password: `%s`", current.ssid,
+            current.password);
   }
 }
 
 #pragma endregion
-

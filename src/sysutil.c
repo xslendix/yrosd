@@ -3,14 +3,14 @@
 #include "common.h"
 #include "yrosd.h"
 
+#include <dirent.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <dirent.h>
-#include <unistd.h>
-#include <signal.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #define MAX_LEN (512)
 
@@ -56,7 +56,7 @@ void
 daemonize()
 {
   pid_t pid;
-  
+
   pid = fork();
   if (pid < 0)
     exit(EXIT_FAILURE);
@@ -74,7 +74,8 @@ daemonize()
     exit(EXIT_SUCCESS);
 }
 
-bool file_exists(char const *path)
+bool
+file_exists(char const *path)
 {
   return access(path, F_OK) == 0;
 }
