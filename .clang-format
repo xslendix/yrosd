@@ -1,10 +1,6 @@
 ﻿---
 AlignArrayOfStructures: Right
-AlignConsecutiveBitFields:
-  Enabled: 'true'
-  AcrossEmptyLines: 'false'
-  AcrossComments: 'true'
-
+AlignConsecutiveBitFields: 'true'
 AlignAfterOpenBracket: Align
 AlignConsecutiveMacros: 'true'
 AlignConsecutiveAssignments: 'true'

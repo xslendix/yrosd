@@ -65,9 +65,7 @@ start_broadcasting(void)
   if (!bmessage)
     LOG_MSG(LOG_FATAL, "Cannot allocate memory for broadcast message!");
 
-  snprintf(bmessage, 50, "YROSDS%s\n%hhd.%hhd.%hhd.%hhd:%hd", app.version,
-           app.running_ip.a, app.running_ip.b, app.running_ip.c,
-           app.running_ip.d, app.running_port);
+  snprintf(bmessage, 50, "YROSDS%s\n%hd", app.version, app.running_port);
 
   pthread_create(&thread_broadcasting, nullptr, &broadcast_loop, nullptr);
   return &thread_broadcasting;
