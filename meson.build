@@ -10,6 +10,7 @@ add_global_arguments(['-Wall', '-Wno-unknown-pragmas'], language : ['c', 'cpp'])
 dependencies = [
   dependency('toml', fallback : ['tomlc99', 'tomlc99_static_dep']),
   dependency('libnm'),
+  dependency('openssl'),
   ]
 
 sources = [

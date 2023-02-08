@@ -79,3 +79,9 @@ file_exists(char const *path)
 {
   return access(path, F_OK) == 0;
 }
+
+bool
+is_root(void)
+{
+  return getuid() == 0;
+}

@@ -9,8 +9,9 @@ extern "C" {
 #endif
 
 pid_t proc_find(char const *proc_name);
-void daemonize();
+void daemonize(void);
 bool file_exists(char const *path);
+bool is_root(void);
 
 #if defined(__cplusplus)
 }

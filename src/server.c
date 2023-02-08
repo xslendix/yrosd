@@ -1,13 +1,15 @@
 #include "server.h"
 
+#include "common.h"
+#include "logging.h"
 #include "pigpiod_if2.h"
-#include "src/common.h"
-#include "src/logging.h"
-#include "src/yrosd.h"
+#include "sysutil.h"
+#include "yrosd.h"
 
 #include <arpa/inet.h>
 #include <ctype.h>
 #include <errno.h>
+#include <openssl/sha.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <string.h>
@@ -21,9 +23,56 @@ typedef struct client_data {
   c_mode_t mode;
 } client_data_t;
 
-// FIXME: CRITICAL: Put this in the user configuration or something lol. Also,
-// should be hashed.
-char *const PASSWORD = "password";
+char const *paths_password_file[] = { "/data/psk", "/etc/psk", "./psk",
+                                      "../psk", nullptr };
+
+char const *
+find_password_file_path(void)
+{
+  i32 i = 0;
+
+  while (paths_password_file[i] != nullptr) {
+    if (file_exists(paths_password_file[i]))
+      return paths_password_file[i];
+    i++;
+  }
+
+  return nullptr;
+}
+
+bool
+check_password_valid(char *psk)
+{
+  trim_string_fast(psk);
+
+  char hash[SHA256_DIGEST_LENGTH];
+
+  /* We compare the password with the hashed stored version. */
+  SHA256((u8 *) psk, strlen(psk), (u8 *) hash);
+
+  char const *file_path = find_password_file_path();
+  if (file_path == nullptr)
+    LOG_MSG(LOG_FATAL, "Auth: Cannot find password file!");
+
+  FILE *fp = fopen(file_path, "rb");
+  fseek(fp, 0, SEEK_END);
+  size_t buf_len = ftell(fp);
+  fseek(fp, 0, SEEK_SET);
+
+  if (buf_len != SHA256_DIGEST_LENGTH)
+    LOG_MSG(LOG_FATAL, "Auth: Invalid password file!");
+
+  u8 *buffer = malloc(buf_len + 1);
+  fread(buffer, buf_len, 1, fp);
+  fclose(fp);
+
+  buffer[buf_len] = 0;
+
+  int status = memcmp(hash, buffer, SHA256_DIGEST_LENGTH) == 0;
+  free(buffer);
+
+  return status == 1;
+}
 
 #define SEND_MSG(sock, msg)                                                    \
   BREAKABLE_SCOPE()                                                            \
@@ -36,6 +85,7 @@ char *const PASSWORD = "password";
     }                                                                          \
   }
 
+/* clang-format: off */
 char const *SETUP_OK =
     (char[]) { 0x00, '\r', '\n',
                '\0' }; // Data on the server has been processed correctly.
@@ -61,13 +111,14 @@ char const *COMMAND_ERR_NOT_FOUND =
     (char[]) { 0x24, '\r', '\n', '\0' }; // Cannot find data/target specified.
 char const *COMMAND_ERR_CFG =
     (char[]) { 0x35, '\r', '\n', '\0' }; // Command not configured.
+/* clang-format: on */
 
 void
 execute_auth(i32 i, char *msg, i32 sock, client_data_t *data, i32 argc,
              char *argv[])
 {
   i32 ret;
-  if (strcmp(msg, PASSWORD) == 0) {
+  if (check_password_valid(msg)) {
     LOG_MSG(LOG_INFO, "Main server: New client logged in successfully!");
     SEND_MSG(sock, AUTH_PASS_OK);
     data->mode = MODE_COMMAND;
@@ -419,6 +470,8 @@ main_server_loop(void *data)
       LOG_MSG(LOG_INFO, "Main server: New connection: %s:%d",
               inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 
+      c_data[i].mode = MODE_AUTH;
+
       if (send(new_socket, message, strlen(message), 0) != strlen(message)) {
         LOG_MSG(LOG_ERROR, "Main server: Failed sending welcome message: %s",
                 strerror(errno));
@@ -439,8 +492,9 @@ main_server_loop(void *data)
       if (FD_ISSET(sd, &readfds)) {
         if ((valread = read(sd, buffer, 1024)) == 0) {
         sock_disconnect:
+          c_data[i].mode = MODE_AUTH;
           getpeername(sd, (struct sockaddr *) &address, (socklen_t *) &addrlen);
-          LOG_MSG(LOG_INFO, "Main server: Host disconnected: %s:%d",
+          LOG_MSG(LOG_INFO, "Main server: Client disconnected: %s:%d",
                   inet_ntoa(address.sin_addr), ntohs(address.sin_port));
 
           close(sd);
