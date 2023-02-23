@@ -76,16 +76,18 @@ INITIALIZATION MODE
 
 SETUP MODE
 ----------
-1. Create an AF_BLUETOOTH socket and start listening for a single connection.
+1. Create a Wi-Fi network in AP mode with no password.
+2. Create a TCP socket and start listening for a single connection.
    If connection is dropped when configuration is incomplete, delete current
    temporary configuration from memory then re-listen again for a new
    connection.
-2. Send a magic header: `YROSsetup<YROS version>\r\n`
-3. Await for client to send data (`usersettings.toml` contents). If data is
+3. Send a magic header: `YROSsetup<YROS version>\r\n`
+4. Await for client to send data (`usersettings.toml` contents). If data is
    invalid, send response `SETUP_ERR_INVALID`.
-4. Await for client to send `SETUP_CLIENT_OK`. Handle cases otherwise.
-5. Write data to `/data/usersettings.toml` and return to INITIALIZATION MODE
+5. Await for client to send `SETUP_CLIENT_OK`. Handle cases otherwise.
+6. Write data to `/data/usersettings.toml` and return to INITIALIZATION MODE
    appropriately.
+7. Close the AP.
 
 AUTH MODE
 ---------
