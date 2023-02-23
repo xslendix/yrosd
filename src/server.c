@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "logging.h"
+#include "motor_controller.h"
 #include "pigpiod_if2.h"
 #include "sysutil.h"
 #include "yrosd.h"
@@ -68,9 +69,8 @@ check_password_valid(char *psk)
 
   buffer[buf_len] = 0;
 
-  int status = memcmp(hash, buffer, SHA256_DIGEST_LENGTH) == 0;
+  i32 status = memcmp(hash, buffer, SHA256_DIGEST_LENGTH) == 0;
   free(buffer);
-
   return status == 1;
 }
 
@@ -85,33 +85,19 @@ check_password_valid(char *psk)
     }                                                                          \
   }
 
-/* clang-format: off */
-char const *SETUP_OK =
-    (char[]) { 0x00, '\r', '\n',
-               '\0' }; // Data on the server has been processed correctly.
-char const *SETUP_CLIENT_OK =
-    (char[]) { 0x01, '\r', '\n',
-               '\0' }; // Data on the client has been processed correctly.
-char const *SETUP_ERR_INVALID =
-    (char[]) { 0x02, '\r', '\n', '\0' }; // Invalid configuration provided.
-char const *AUTH_PASS_FAIL =
-    (char[]) { 0x10, '\r', '\n',
-               '\0' }; // Authentication failed. Please try again.
-char const *AUTH_PASS_OK =
-    (char[]) { 0x10, '\r', '\n', '\0' }; // Authentication succeeded.
-char const *COMMAND_OK =
-    (char[]) { 0x20, '\r', '\n', '\0' }; // Command executed successfully.
-char const *COMMAND_ERR_UNK =
-    (char[]) { 0x21, '\r', '\n', '\0' }; // An unknown error occured.
-char const *COMMAND_ERR_ARGC =
-    (char[]) { 0x22, '\r', '\n', '\0' }; // Not enough arguments.
-char const *COMMAND_ERR_INV_ARG =
-    (char[]) { 0x23, '\r', '\n', '\0' }; // Invalid argument(s).
-char const *COMMAND_ERR_NOT_FOUND =
-    (char[]) { 0x24, '\r', '\n', '\0' }; // Cannot find data/target specified.
-char const *COMMAND_ERR_CFG =
-    (char[]) { 0x35, '\r', '\n', '\0' }; // Command not configured.
-/* clang-format: on */
+/* clang-format off */
+char const *SETUP_OK              = (char[]) { 0x00, '\r', '\n', '\0' }; /* Data on the server has been processed correctly. */
+char const *SETUP_CLIENT_OK       = (char[]) { 0x01, '\r', '\n', '\0' }; /* Data on the client has been processed correctly. */
+char const *SETUP_ERR_INVALID     = (char[]) { 0x02, '\r', '\n', '\0' }; /* Invalid configuration provided. */
+char const *AUTH_PASS_FAIL        = (char[]) { 0x10, '\r', '\n', '\0' }; /* Authentication failed. Please try again. */
+char const *AUTH_PASS_OK          = (char[]) { 0x10, '\r', '\n', '\0' }; /* Authentication succeeded. */
+char const *COMMAND_OK            = (char[]) { 0x20, '\r', '\n', '\0' }; /* Command executed successfully. */
+char const *COMMAND_ERR_UNK       = (char[]) { 0x21, '\r', '\n', '\0' }; /* An unknown error occured. */
+char const *COMMAND_ERR_ARGC      = (char[]) { 0x22, '\r', '\n', '\0' }; /* Not enough arguments. */
+char const *COMMAND_ERR_INV_ARG   = (char[]) { 0x23, '\r', '\n', '\0' }; /* Invalid argument(s). */
+char const *COMMAND_ERR_NOT_FOUND = (char[]) { 0x24, '\r', '\n', '\0' }; /* Cannot find data/target specified. */
+char const *COMMAND_ERR_CFG       = (char[]) { 0x35, '\r', '\n', '\0' }; /* Command not configured. */
+/* clang-format on */
 
 void
 execute_auth(i32 i, char *msg, i32 sock, client_data_t *data, i32 argc,
@@ -127,12 +113,6 @@ execute_auth(i32 i, char *msg, i32 sock, client_data_t *data, i32 argc,
                       "configuration on client side or a possible attack.");
     SEND_MSG(sock, AUTH_PASS_FAIL);
   }
-}
-
-void
-execute_setup(i32 i, char *msg, i32 sock, client_data_t *data, i32 argc,
-              char *argv[])
-{
 }
 
 typedef enum gpio_action {
@@ -226,7 +206,7 @@ execute_command(i32 i, char *msg, i32 sock, client_data_t *data, i32 argc,
 
       value = CLAMP(value, 0, 255);
 
-      // FIXME: Implement.
+      /* FIXME: Implement. */
     }
     case ACTION_DIGITAL_WRITE:
     {
@@ -335,6 +315,77 @@ execute_command(i32 i, char *msg, i32 sock, client_data_t *data, i32 argc,
       app.system_settings.hardware.motors.motors[motor_id].enabled = true;
     } break;
     }
+  } else if (!strcmp(argv[0], "drive") || !strcmp(argv[0], "d")) {
+    u8 args = 0;
+
+    /* clang-format off */
+    switch (app.system_settings.driving.mode) {
+    case SINGLE:   args = 1; break; /* Forward/Back */
+    case TANK:                      /* Left, Right */
+    case QUADTANK:                  /* Left, Right */
+    case MECANUM:  args = 4; break; /* Drive, Strafe, Twist */
+    }
+    /* clang-format on */
+
+    if (argc < args + 1 || args == 0) {
+      LOG_MSG(LOG_ERROR, "Main server: DRIVE: Not enough arguments provided.");
+      SEND_MSG(sock, COMMAND_ERR_INV_ARG);
+      return;
+    }
+
+    double *argv2 = calloc(1, sizeof(double) * args);
+
+    char *err;
+    i32 i;
+    for (i = 0; i < args; i++) {
+      double value = strtod(argv[i + 1], &err);
+      if (errno == ERANGE || err == argv[i + 1]) {
+        LOG_MSG(LOG_ERROR, "Main server: MOTOR: Invalid motor speed.");
+        SEND_MSG(sock, COMMAND_ERR_INV_ARG);
+        return;
+      }
+      argv2[i] = value;
+    }
+
+    /* FIXME: When loading configuration, check motor count for mode. */
+    switch (app.system_settings.driving.mode) {
+    case SINGLE:
+      motor_controller_set_speed(&app.motor_controller,
+                                 GET_APP_MOTOR(motor_top_left), argv2[0]);
+      break;
+    case TANK:
+      motor_controller_set_speed(&app.motor_controller,
+                                 GET_APP_MOTOR(motor_top_left), argv2[0]);
+      motor_controller_set_speed(&app.motor_controller,
+                                 GET_APP_MOTOR(motor_top_right), argv2[1]);
+      break;
+    case QUADTANK:
+      motor_controller_set_speed(&app.motor_controller,
+                                 GET_APP_MOTOR(motor_top_left), argv2[0]);
+      motor_controller_set_speed(&app.motor_controller,
+                                 GET_APP_MOTOR(motor_top_right), argv2[1]);
+      motor_controller_set_speed(&app.motor_controller,
+                                 GET_APP_MOTOR(motor_bottom_left), argv2[0]);
+      motor_controller_set_speed(&app.motor_controller,
+                                 GET_APP_MOTOR(motor_bottom_right), argv2[1]);
+      break;
+    case MECANUM:
+      motor_controller_set_speed(&app.motor_controller,
+                                 GET_APP_MOTOR(motor_top_left),
+                                 argv2[0] + argv2[1] + argv2[2]);
+      motor_controller_set_speed(&app.motor_controller,
+                                 GET_APP_MOTOR(motor_top_right),
+                                 argv2[0] - argv2[1] - argv2[2]);
+      motor_controller_set_speed(&app.motor_controller,
+                                 GET_APP_MOTOR(motor_bottom_left),
+                                 argv2[0] - argv2[1] + argv2[2]);
+      motor_controller_set_speed(&app.motor_controller,
+                                 GET_APP_MOTOR(motor_bottom_right),
+                                 argv2[0] + argv2[1] - argv2[2]);
+      break;
+    }
+
+    free(argv2);
   } else {
     SEND_MSG(sock, COMMAND_ERR_UNK);
   }
@@ -379,7 +430,6 @@ parse_message(i32 i, char *msg, client_data_t *data, i32 sock)
 
   switch (data->mode) {
   case MODE_AUTH: execute_auth(i, msg, sock, data, argc, argv); break;
-  case MODE_SETUP: execute_setup(i, msg, sock, data, argc, argv); break;
   case MODE_COMMAND: execute_command(i, msg, sock, data, argc, argv); break;
   default:
     LOG_MSG(LOG_FATAL,
@@ -491,7 +541,6 @@ main_server_loop(void *data)
 
       if (FD_ISSET(sd, &readfds)) {
         if ((valread = read(sd, buffer, 1024)) == 0) {
-        sock_disconnect:
           c_data[i].mode = MODE_AUTH;
           getpeername(sd, (struct sockaddr *) &address, (socklen_t *) &addrlen);
           LOG_MSG(LOG_INFO, "Main server: Client disconnected: %s:%d",

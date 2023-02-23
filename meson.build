@@ -19,6 +19,7 @@ sources = [
   'src/networking.c',
   'src/logging.c',
   'src/server.c',
+  'src/setup.c',
   'src/settings.c',
   'src/sysutil.c',
   'src/yrosd.c',

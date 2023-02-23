@@ -262,31 +262,39 @@ find_user_settings_path(void)
   return nullptr;
 }
 
-user_settings_t
-load_user_settings(char const *file)
+char const *dir_paths_user_settings[] = { "/data/", "/etc/", "./", "../",
+                                          nullptr };
+
+char const *
+find_user_settings_dir_path_with_perms(void)
 {
-  char err_[200];
-  char *err            = err_;
+  i32 i = 0;
+
+  while (dir_paths_user_settings[i] != nullptr) {
+    if (access(dir_paths_user_settings[i], W_OK))
+      return dir_paths_user_settings[i];
+    i++;
+  }
+
+  return nullptr;
+}
+
+user_settings_t
+parse_user_settings(toml_table_t *conf, char *err_)
+{
   user_settings_t user = { 0 };
-  FILE *fp             = fopen(file, "r");
-
-#undef throw_error
-#define throw_error()                                                          \
-  LOG_MSG(LOG_FATAL, "Cannot parse user configuration file: %s", err);
-
-  if (!fp)
-    LOG_MSG(LOG_FATAL, "Cannot open user configuration file `%s`: %s", file,
-            strerror(errno));
+  char *err            = err_;
 
   user.is_valid = false;
 
-  toml_table_t *conf = toml_parse_file(fp, err, 200);
-  fclose(fp);
+#undef throw_error
+#define throw_error()                                                          \
+  LOG_MSG(LOG_ERROR, "Cannot parse user configuration file: %s", err);         \
+  user.is_valid = false;                                                       \
+  return user;
 
   if (!conf)
     throw_error();
-
-  user.is_valid = true;
 
   BREAKABLE_SCOPE()
   {
@@ -340,7 +348,37 @@ load_user_settings(char const *file)
     }
   }
 
+  user.is_valid = true;
+
   return user;
+}
+
+user_settings_t
+load_user_settings_string(char const *data)
+{
+  char err[200];
+  toml_table_t *conf = toml_parse((char *) data, err, 200);
+  return parse_user_settings(conf, err);
+}
+
+user_settings_t
+load_user_settings(char const *file)
+{
+  if (file == nullptr) {
+    return (user_settings_t) { .is_valid = false };
+  }
+
+  FILE *fp = fopen(file, "r");
+  char err[200];
+
+  if (!fp)
+    LOG_MSG(LOG_FATAL, "Cannot open user configuration file `%s`: %s", file,
+            strerror(errno));
+
+  toml_table_t *conf = toml_parse_file(fp, err, 200);
+  fclose(fp);
+
+  return parse_user_settings(conf, err);
 }
 
 void

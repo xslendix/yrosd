@@ -46,9 +46,9 @@ log_msg(logging_t *logger, log_level_t const level, char const *format, ...)
 
 #define LOG()                                                                  \
   {                                                                            \
-    fprintf(fp, "[%02d-%02d-%d %d:%d:%d] %s: ", tm.tm_mday, tm.tm_mon + 1,     \
-            tm.tm_year + 1900, tm.tm_hour, tm.tm_min, tm.tm_sec,               \
-            get_log_level_name(level));                                        \
+    fprintf(fp, "[%02d-%02d-%d %02d:%02d:%02d] %s: ", tm.tm_mday,              \
+            tm.tm_mon + 1, tm.tm_year + 1900, tm.tm_hour, tm.tm_min,           \
+            tm.tm_sec, get_log_level_name(level));                             \
     vfprintf(fp, format, ap);                                                  \
     fputc('\n', fp);                                                           \
   }

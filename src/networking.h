@@ -27,6 +27,8 @@ typedef struct ipv4_addr {
 bool add_wifi_network_if_not_exist(NMClient *client, wifi_network_t network);
 bool rescan_wifi_networks(NMClient *client);
 
+NMConnection *create_and_activate_hotspot(NMClient *client, char const *ssid);
+
 pthread_t *start_broadcasting(void);
 void stop_broadcasting(void);
 

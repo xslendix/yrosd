@@ -52,6 +52,8 @@ typedef struct user_settings {
 } user_settings_t;
 
 char const *find_user_settings_path(void);
+char const *find_user_settings_dir_path_with_perms(void);
+user_settings_t load_user_settings_string(char const *data);
 user_settings_t load_user_settings(char const *file);
 void print_user_settings(user_settings_t settings);
 

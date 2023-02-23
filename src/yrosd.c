@@ -2,11 +2,15 @@
 
 #include "common.h"
 #include "logging.h"
+#include "networking.h"
 #include "pigpiod_if2.h"
 #include "server.h"
 #include "settings.h"
+#include "setup.h"
 #include "sysutil.h"
 
+#include <NetworkManager.h>
+#include <glib.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,6 +25,22 @@ clean_quit(void)
   // free_system_settings(system_settings);
 
   pigpio_stop(app.pi);
+}
+
+void
+on_disconnect(GObject *source_object, GAsyncResult *res, gpointer user_data)
+{
+  GError *error = NULL;
+  nm_client_deactivate_connection_finish(NM_CLIENT(source_object), res, &error);
+  if (!error) {
+    g_print("Disconnected successfully\n");
+  } else {
+    g_print("Failed to disconnect: %s\n", error->message);
+    g_error_free(error);
+  }
+  fflush(stdout);
+
+  g_main_loop_quit(user_data);
 }
 
 i32
@@ -82,8 +102,39 @@ main(i32 argc, char **argv)
   char const *user_settings_path = find_user_settings_path();
   app.user_settings              = load_user_settings(user_settings_path);
   if (!app.user_settings.is_valid) {
-    LOG_MSG(LOG_FIXME, "Implement SETUP MODE.");
-    LOG_MSG(LOG_FATAL, "Cannot proceed further, invalid user configuration.");
+    LOG_MSG(LOG_ERROR, "Invalid user configuration. Entering SETUP.");
+    user_settings_t settings = { 0 };
+    while (settings.is_valid == false) {
+      create_and_activate_hotspot(app.client, app.user_settings.general.name);
+      char *data_out;
+      settings = do_setup_mode(data_out);
+      if (!data_out)
+        LOG_MSG(LOG_FATAL, "Missing buffer after setup!");
+
+      char const *user_settings_dir = find_user_settings_dir_path_with_perms();
+      if (!user_settings_dir)
+        LOG_MSG(LOG_FATAL,
+                "Cannot find any directory to write user settings to!");
+
+      FILE *fp =
+          fopen(text_format("%s/usersettings.toml", user_settings_dir), "w+");
+      if (!fp)
+        LOG_MSG(LOG_FATAL, "Cannot open user settings file for writing!");
+
+      fwrite(data_out, sizeof(char), strlen(data_out), fp);
+      free(data_out);
+      fclose(fp);
+
+      NMDevice *wlan = nm_client_get_device_by_iface(app.client, "wlan0");
+      if (!wlan)
+        LOG_MSG(LOG_FATAL, "Cannot find WLAN device!");
+
+      GMainLoop *loop = g_main_loop_new(NULL, FALSE);
+      nm_client_deactivate_connection_async(
+          app.client, nm_client_get_primary_connection(app.client), NULL,
+          on_disconnect, loop);
+      g_main_loop_run(loop);
+    }
   }
   print_user_settings(app.user_settings);
 
@@ -105,6 +156,7 @@ reload_signal_handler(i32 signum)
     LOG_MSG(LOG_ERROR, "Cannot find path of `syssettings.toml`!");
     return;
   }
+
   system_settings_t system_settings =
       load_system_settings(system_settings_path);
   if (!system_settings.is_valid) {
@@ -112,6 +164,7 @@ reload_signal_handler(i32 signum)
             "Invalid system configuration. Using previous configuration.");
     return;
   }
+
   app.system_settings = system_settings;
   LOG_MSG(LOG_INFO, "New configuration file loaded successfully!");
 }

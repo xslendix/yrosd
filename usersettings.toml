@@ -1,5 +1,5 @@
 [General]
-RobotName="my-robot"
+RobotName="my_robot"
 
 [Conectivity]
 WiFiNetworks=[

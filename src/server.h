@@ -13,7 +13,6 @@ pthread_t *start_main_server(void);
 
 typedef enum c_mode {
   MODE_AUTH,
-  MODE_SETUP,
   MODE_COMMAND,
 } c_mode_t;
 

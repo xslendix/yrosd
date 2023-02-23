@@ -25,6 +25,10 @@ typedef struct app {
   motor_controller_t motor_controller;
 } app_t;
 
+#define GET_APP_MOTOR(motor)                                                   \
+  (&app.system_settings.hardware.motors                                        \
+        .motors[app.system_settings.driving.motor])
+
 extern app_t app;
 
 void initialise_signals(void);
