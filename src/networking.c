@@ -183,6 +183,9 @@ create_and_activate_hotspot(NMClient *client, const char *ssid)
 {
   validate_current_hotspot_connection(client);
 
+  if (ssid == nullptr)
+    ssid = "YROS Robot";
+
   LOG_MSG(LOG_INFO, "Starting wireless hotspot. SSID: %s", ssid);
 
   /* We already have a hotspot active, just return that connection. */
@@ -230,22 +233,6 @@ create_and_activate_hotspot(NMClient *client, const char *ssid)
   GBytes *ssid_b = g_bytes_new(ssid, strlen(ssid) + 1);
   g_object_set(s_wifi, "ssid", ssid_b, NULL);
   g_bytes_unref(ssid_b);
-
-  NMSettingWirelessSecurity *s_wsec =
-      (NMSettingWirelessSecurity *) nm_setting_wireless_security_new();
-
-  char key_str[11];
-  const gchar *hex_digits = "0123456789abcdef";
-  for (i32 i = 0; i < 10; i++) {
-    i8 digit;
-    digit      = g_random_int_range(0, 16);
-    key_str[i] = hex_digits[digit];
-  }
-  key_str[10] = '\0';
-
-  g_object_set(s_wsec, "key-mgmt", "none", "wep-key0", key_str, "wep-key-type",
-               NM_WEP_KEY_TYPE_KEY, NULL);
-  nm_connection_add_setting(connection, (NMSetting *) s_wsec);
 
   nm_client_add_and_activate_connection_async(
       client, connection, wlan_device, NULL, NULL, on_connection_added, loop);
