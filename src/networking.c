@@ -70,11 +70,12 @@ broadcast_loop(void *data)
 pthread_t *
 start_broadcasting(void)
 {
-  bmessage = malloc(sizeof(char) * 50);
+  bmessage = malloc(sizeof(char) * 255);
   if (!bmessage)
     LOG_MSG(LOG_FATAL, "Cannot allocate memory for broadcast message!");
 
-  snprintf(bmessage, 50, "YROSDS%s\n%hd", app.version, app.running_port);
+  snprintf(bmessage, 255, "YROSDS %s %hd %s", app.version, app.running_port,
+           app.user_settings.general.name);
 
   pthread_create(&thread_broadcasting, nullptr, &broadcast_loop, nullptr);
   return &thread_broadcasting;

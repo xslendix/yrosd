@@ -211,7 +211,7 @@ The discovery packet is used to see what YROS devices are available on the
 network by clients. It must contain the following:
 
 ```
-YROSDS<YROS version> <main port>
+YROSDS <YROSD protocol version> <main port> <UserSettings.RobotName>
 ```
 
 This, however, must be sent only every 5 seconds. This is to not spam the

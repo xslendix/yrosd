@@ -88,7 +88,7 @@ main(i32 argc, char **argv)
     LOG_MSG(LOG_FATAL, "Cannot motor controller.");
 
   app.running_port = random_u16(8000, 10000);
-  app.version      = "23.1";
+  app.version      = PROTOCOL_VERSION;
 
   LOG_MSG(LOG_INFO, "Loading system configuration file.");
   char const *syssettings_path = find_system_settings_path();
