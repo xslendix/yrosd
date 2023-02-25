@@ -46,9 +46,6 @@ broadcast(char const *mess, u16 port)
   s.sin_port        = htons(port);
   s.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 
-  if (bind(broadcast_socket, (struct sockaddr *) &s, sizeof(s)) < 0)
-    LOG_MSG(LOG_FATAL, "Cannot bind socket! %s", strerror(errno));
-
   LOG_MSG(LOG_DEBUG, "Sending broadcast message port %hd", port)
   if (sendto(broadcast_socket, mess, strlen(mess), 0, (struct sockaddr *) &s,
              sizeof(s)) < 0)
