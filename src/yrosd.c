@@ -68,6 +68,11 @@ main(i32 argc, char **argv)
       printf("YROS Daemon version %s (Protocol %s).\n", VERSION,
              PROTOCOL_VERSION);
       return EXIT_SUCCESS;
+    } else if (!strcmp(argv[i], "-l") || !strcmp(argv[i], "--log-level")) {
+      if (i + 1 == argc)
+        LOG_MSG(LOG_FATAL, "No log level specified. Exiting.");
+
+      set_level_logging_from_str(NULL, argv[++i]);
     } else {
       LOG_MSG(LOG_FATAL, "Invalid argument: `%s`", argv[i]);
     }

@@ -5,9 +5,41 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 logging_t *DEFAULT_LOGGER = nullptr;
+
+void
+set_level_logging_from_str(logging_t *logger, char *level)
+{
+  if (!level)
+    return;
+
+  if (!logger)
+    logger = DEFAULT_LOGGER;
+
+  if (!logger)
+    init_logging();
+
+  to_lower_string(level);
+  trim_string_fast(level);
+
+  if (strcmp(level, "debug") == 0)
+    logger->current_level = LOG_DEBUG;
+  else if (strcmp(level, "fixme") == 0)
+    logger->current_level = LOG_FIXME;
+  else if (strcmp(level, "info") == 0)
+    logger->current_level = LOG_INFO;
+  else if (strcmp(level, "warning") == 0)
+    logger->current_level = LOG_WARNING;
+  else if (strcmp(level, "error") == 0)
+    logger->current_level = LOG_ERROR;
+  else if (strcmp(level, "fatal") == 0)
+    logger->current_level = LOG_FATAL;
+  else
+    LOG_MSG(LOG_FATAL, "Invalid logging level!");
+}
 
 logging_t *
 init_logging()
@@ -17,6 +49,13 @@ init_logging()
   logger->log_file      = nullptr;
   logger->fp            = nullptr;
   logger->current_level = LOG_DEBUG;
+
+  char *level = getenv("LOG_LEVEL");
+  if (!level)
+    return logger;
+
+  set_level_logging_from_str(logger, level);
+
   return logger;
 }
 

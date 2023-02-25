@@ -11,8 +11,8 @@ typedef enum log_level {
   LOG_ERROR,
   LOG_WARNING,
   LOG_INFO,
-  LOG_DEBUG,
   LOG_FIXME,
+  LOG_DEBUG,
 } log_level_t;
 
 typedef struct logging {
@@ -23,6 +23,7 @@ typedef struct logging {
 
 extern logging_t *DEFAULT_LOGGER;
 
+void set_level_logging_from_str(logging_t *logger, char *level);
 logging_t *init_logging();
 void log_msg(logging_t *logger, log_level_t const level, char const *format,
              ...);

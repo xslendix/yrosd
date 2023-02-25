@@ -50,6 +50,8 @@ broadcast(char const *mess, u16 port)
   if (sendto(broadcast_socket, mess, strlen(mess), 0, (struct sockaddr *) &s,
              sizeof(s)) < 0)
     LOG_MSG(LOG_FATAL, "sendto: %s", strerror(errno));
+
+  close(broadcast_socket);
 }
 
 char *bmessage = nullptr;
