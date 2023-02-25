@@ -289,9 +289,11 @@ parse_user_settings(toml_table_t *conf, char *err_)
 
 #undef throw_error
 #define throw_error()                                                          \
-  LOG_MSG(LOG_ERROR, "Cannot parse user configuration file: %s", err);         \
-  user.is_valid = false;                                                       \
-  return user;
+  {                                                                            \
+    LOG_MSG(LOG_ERROR, "Cannot parse user configuration file: %s", err);       \
+    user.is_valid = false;                                                     \
+    return user;                                                               \
+  }
 
   if (!conf)
     throw_error();
@@ -300,12 +302,12 @@ parse_user_settings(toml_table_t *conf, char *err_)
   {
     toml_table_t *general_cat = toml_table_in(conf, "General");
     if (!general_cat)
-      return user;
+      throw_error();
 
     toml_datum_t robot_name = toml_string_in(general_cat, "RobotName");
     if (!robot_name.ok) {
       err = "General.RobotName not set.";
-      return user;
+      throw_error();
     }
 
     user.general.name = robot_name.u.s;
@@ -314,19 +316,25 @@ parse_user_settings(toml_table_t *conf, char *err_)
   BREAKABLE_SCOPE()
   {
     toml_table_t *conectivity_cat = toml_table_in(conf, "Conectivity");
-    if (!conectivity_cat)
+    if (!conectivity_cat) {
+      user.is_valid = true;
       return user;
+    }
 
     toml_array_t *wifi_networks =
         toml_array_in(conectivity_cat, "WiFiNetworks");
-    if (!wifi_networks)
+    if (!wifi_networks) {
+      user.is_valid = true;
       return user;
+    }
 
     user.conectivity.wifi_networks.cnt = toml_array_nelem(wifi_networks);
     user.conectivity.wifi_networks.networks =
         calloc(1, sizeof(wifi_network_t) * user.conectivity.wifi_networks.cnt);
-    if (!user.conectivity.wifi_networks.networks)
+    if (!user.conectivity.wifi_networks.networks) {
+      user.is_valid = true;
       return user;
+    }
 
     for (i32 i = 0; i < user.conectivity.wifi_networks.cnt; i++) {
       wifi_network_t *current = &user.conectivity.wifi_networks.networks[i];
@@ -334,7 +342,7 @@ parse_user_settings(toml_table_t *conf, char *err_)
       toml_datum_t ssid       = toml_string_in(network, "ssid");
       if (!ssid.ok) {
         err = "Conectivity.WiFiNetworks.*.ssid not set.";
-        return user;
+        throw_error();
       }
       current->ssid = ssid.u.s;
 
@@ -364,7 +372,10 @@ load_user_settings_string(char const *data)
 user_settings_t
 load_user_settings(char const *file)
 {
+  LOG_MSG(LOG_DEBUG, "Trying to load user settings from %s.", file);
+
   if (file == nullptr) {
+    LOG_MSG(LOG_WARNING, "User settings path is NULL.");
     return (user_settings_t) { .is_valid = false };
   }
 
@@ -376,9 +387,13 @@ load_user_settings(char const *file)
             strerror(errno));
 
   toml_table_t *conf = toml_parse_file(fp, err, 200);
+  if (!conf)
+    LOG_MSG(LOG_FATAL, "Cannot parse user configuration file: %s", err);
+
   fclose(fp);
 
-  return parse_user_settings(conf, err);
+  user_settings_t settings = parse_user_settings(conf, err);
+  return settings;
 }
 
 void
