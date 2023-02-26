@@ -283,7 +283,7 @@ execute_command(i32 i, char *msg, i32 sock, client_data_t *data, i32 argc,
       if (IS_OK(motor_controller_set_speed(
               &app.motor_controller,
               &app.system_settings.hardware.motors.motors[motor_id], speed))) {
-        LOG_MSG(LOG_ERROR, "Main server: MOTOR: Set motor speed successfully.");
+        LOG_MSG(LOG_INFO, "Main server: MOTOR: Set motor speed successfully.");
         SEND_MSG(sock, COMMAND_OK);
         return;
       } else {
@@ -297,7 +297,7 @@ execute_command(i32 i, char *msg, i32 sock, client_data_t *data, i32 argc,
       if (IS_OK(motor_controller_set_speed(
               &app.motor_controller,
               &app.system_settings.hardware.motors.motors[motor_id], 0))) {
-        LOG_MSG(LOG_ERROR, "Main server: MOTOR: Set motor speed successfully.");
+        LOG_MSG(LOG_INFO, "Main server: MOTOR: Set motor speed successfully.");
         SEND_MSG(sock, COMMAND_OK);
         return;
       } else {
